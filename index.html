@@ -17,7 +17,7 @@
         .form-transition { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
         .form-hidden { display: none; opacity: 0; transform: scale(0.95); }
         .form-visible { display: block; opacity: 1; transform: scale(1); }
-        #auth-container.hidden, #app-wrapper.hidden { display: none; }
+        #auth-wrapper.hidden, #app-wrapper.hidden { display: none; }
         .job-card {
             opacity: 0;
             transform: translateY(20px);
@@ -64,125 +64,129 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 min-h-screen p-4 flex items-center justify-center">
+<body class="bg-gray-900 min-h-screen">
 
     <!-- Toast Notification Element -->
     <div id="toast"></div>
 
-    <div id="auth-container" class="relative w-full max-w-md mx-auto bg-gray-800 text-white rounded-2xl shadow-2xl p-8 overflow-hidden">
-        
-        <!-- Post-Signup Message -->
-        <div id="post-signup-message" class="hidden text-center">
-            <h2 class="text-2xl font-bold text-green-400">Success!</h2>
-            <p class="text-gray-300 mt-2">Please check your email for a confirmation link to complete your registration.</p>
-        </div>
-
-        <!-- Login Form -->
-        <div id="login-form" class="form-transition form-visible">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold tracking-tight">Welcome Back!</h1>
-                <p class="text-gray-400 mt-2">Sign in to continue to your account.</p>
-            </div>
+    <!-- Wrapper for Authentication Forms (Centered) -->
+    <div id="auth-wrapper" class="w-full min-h-screen flex items-center justify-center p-4">
+        <div id="auth-container" class="relative w-full max-w-md mx-auto bg-gray-800 text-white rounded-2xl shadow-2xl p-8 overflow-hidden">
             
-            <form id="login-form-element">
-                <div class="space-y-6">
-                    <div>
-                        <label for="login-email" class="block text-sm font-medium text-gray-300">Email Address</label>
-                        <input type="email" id="login-email" name="email" placeholder="you@example.com" required
-                               class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
-                    </div>
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <label for="login-password" class="block text-sm font-medium text-gray-300">Password</label>
-                            <a href="#" class="text-sm font-medium text-indigo-400 hover:text-indigo-300">Forgot password?</a>
+            <!-- Post-Signup Message -->
+            <div id="post-signup-message" class="hidden text-center">
+                <h2 class="text-2xl font-bold text-green-400">Success!</h2>
+                <p class="text-gray-300 mt-2">Please check your email for a confirmation link to complete your registration.</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="form-transition form-visible">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold tracking-tight">Welcome Back!</h1>
+                    <p class="text-gray-400 mt-2">Sign in to continue to your account.</p>
+                </div>
+                
+                <form id="login-form-element">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="login-email" class="block text-sm font-medium text-gray-300">Email Address</label>
+                            <input type="email" id="login-email" name="email" placeholder="you@example.com" required
+                                   class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
                         </div>
-                        <input type="password" id="login-password" name="password" placeholder="••••••••" required
-                               class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <label for="login-password" class="block text-sm font-medium text-gray-300">Password</label>
+                                <a href="#" class="text-sm font-medium text-indigo-400 hover:text-indigo-300">Forgot password?</a>
+                            </div>
+                            <input type="password" id="login-password" name="password" placeholder="••••••••" required
+                                   class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                        </div>
                     </div>
+                    
+                    <div class="mt-8">
+                        <button type="submit"
+                                class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="btn-text">Sign In</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-6 relative">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-600"></div></div>
+                    <div class="relative flex justify-center text-sm"><span class="px-2 bg-gray-800 text-gray-400">Or continue with</span></div>
                 </div>
-                
-                <div class="mt-8">
-                    <button type="submit"
-                            class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span class="btn-text">Sign In</span>
+
+                <div class="mt-6">
+                    <button id="google-signin-btn" type="button"
+                            class="w-full inline-flex justify-center py-3 px-4 border border-gray-600 rounded-lg shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
+                        <svg class="w-5 h-5 mr-2 -ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-76.2 76.2c-20.1-17.1-47.3-27.1-78.7-27.1-71.8 0-130 58.2-130 130s58.2 130 130 130c83.5 0 119.8-63.1 123.6-96.1H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>
+                        Sign in with Google
                     </button>
                 </div>
-            </form>
 
-            <div class="mt-6 relative">
-                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-600"></div></div>
-                <div class="relative flex justify-center text-sm"><span class="px-2 bg-gray-800 text-gray-400">Or continue with</span></div>
+                <p class="mt-8 text-center text-sm text-gray-400">
+                    Don't have an account? 
+                    <button id="show-signup" class="font-medium text-indigo-400 hover:text-indigo-300">Sign up</button>
+                </p>
             </div>
 
-            <div class="mt-6">
-                <button id="google-signin-btn" type="button"
-                        class="w-full inline-flex justify-center py-3 px-4 border border-gray-600 rounded-lg shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
-                    <svg class="w-5 h-5 mr-2 -ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-76.2 76.2c-20.1-17.1-47.3-27.1-78.7-27.1-71.8 0-130 58.2-130 130s58.2 130 130 130c83.5 0 119.8-63.1 123.6-96.1H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>
-                    Sign in with Google
-                </button>
-            </div>
-
-            <p class="mt-8 text-center text-sm text-gray-400">
-                Don't have an account? 
-                <button id="show-signup" class="font-medium text-indigo-400 hover:text-indigo-300">Sign up</button>
-            </p>
-        </div>
-
-        <!-- Signup Form -->
-        <div id="signup-form" class="form-transition form-hidden">
-             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold tracking-tight">Create an Account</h1>
-                <p class="text-gray-400 mt-2">Get started with a free account today.</p>
-            </div>
-            
-            <form id="signup-form-element">
-                <div class="space-y-6">
-                    <div>
-                        <label for="signup-name" class="block text-sm font-medium text-gray-300">Full Name</label>
-                        <input type="text" id="signup-name" name="name" placeholder="John Doe" required
-                               class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
-                    </div>
-                    <div>
-                        <label for="signup-email" class="block text-sm font-medium text-gray-300">Email Address</label>
-                        <input type="email" id="signup-email" name="email" placeholder="you@example.com" required
-                               class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
-                    </div>
-                    <div>
-                        <label for="signup-password" class="block text-sm font-medium text-gray-300">Password</label>
-                        <input type="password" id="signup-password" name="password" placeholder="Minimum 6 characters" required
-                               class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
-                    </div>
+            <!-- Signup Form -->
+            <div id="signup-form" class="form-transition form-hidden">
+                 <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold tracking-tight">Create an Account</h1>
+                    <p class="text-gray-400 mt-2">Get started with a free account today.</p>
                 </div>
                 
-                <div class="mt-8">
-                    <button type="submit"
-                            class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span class="btn-text">Create Account</span>
+                <form id="signup-form-element">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="signup-name" class="block text-sm font-medium text-gray-300">Full Name</label>
+                            <input type="text" id="signup-name" name="name" placeholder="John Doe" required
+                                   class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                        </div>
+                        <div>
+                            <label for="signup-email" class="block text-sm font-medium text-gray-300">Email Address</label>
+                            <input type="email" id="signup-email" name="email" placeholder="you@example.com" required
+                                   class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                        </div>
+                        <div>
+                            <label for="signup-password" class="block text-sm font-medium text-gray-300">Password</label>
+                            <input type="password" id="signup-password" name="password" placeholder="Minimum 6 characters" required
+                                   class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <button type="submit"
+                                class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="btn-text">Create Account</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-6 relative">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-600"></div></div>
+                    <div class="relative flex justify-center text-sm"><span class="px-2 bg-gray-800 text-gray-400">Or sign up with</span></div>
+                </div>
+
+                <div class="mt-6">
+                    <button id="google-signup-btn" type="button"
+                            class="w-full inline-flex justify-center py-3 px-4 border border-gray-600 rounded-lg shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
+                         <svg class="w-5 h-5 mr-2 -ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-76.2 76.2c-20.1-17.1-47.3-27.1-78.7-27.1-71.8 0-130 58.2-130 130s58.2 130 130 130c83.5 0 119.8-63.1 123.6-96.1H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>
+                        Sign up with Google
                     </button>
                 </div>
-            </form>
 
-            <div class="mt-6 relative">
-                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-600"></div></div>
-                <div class="relative flex justify-center text-sm"><span class="px-2 bg-gray-800 text-gray-400">Or sign up with</span></div>
+                <p class="mt-8 text-center text-sm text-gray-400">
+                    Already have an account? 
+                    <button id="show-login" class="font-medium text-indigo-400 hover:text-indigo-300">Sign in</button>
+                </p>
             </div>
-
-            <div class="mt-6">
-                <button id="google-signup-btn" type="button"
-                        class="w-full inline-flex justify-center py-3 px-4 border border-gray-600 rounded-lg shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
-                     <svg class="w-5 h-5 mr-2 -ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-76.2 76.2c-20.1-17.1-47.3-27.1-78.7-27.1-71.8 0-130 58.2-130 130s58.2 130 130 130c83.5 0 119.8-63.1 123.6-96.1H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>
-                    Sign up with Google
-                </button>
-            </div>
-
-            <p class="mt-8 text-center text-sm text-gray-400">
-                Already have an account? 
-                <button id="show-login" class="font-medium text-indigo-400 hover:text-indigo-300">Sign in</button>
-            </p>
         </div>
     </div>
     
-    <div id="app-wrapper" class="hidden w-full max-w-5xl mx-auto">
+    <!-- Wrapper for the main application -->
+    <div id="app-wrapper" class="hidden w-full max-w-5xl mx-auto p-4">
         <!-- Job Board Page -->
         <div id="job-board-container" class="hidden w-full bg-gray-800 text-white rounded-2xl shadow-2xl p-8">
             <!-- Header -->
@@ -332,7 +336,7 @@
         const { createClient } = supabase;
         const SUPABASE_URL = 'https://vhefdvimaeleadjscfqd.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoZWZkdmltYWVsZWFkanNjZnFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyODQ2NTIsImV4cCI6MjA3NDg2MDY1Mn0.EBjGCi1XIEbttotFeM3ESKbpWBOPyrMVnvaVEIlL5c8';
-        const ADMIN_USER_ID = '5313a206-1ecb-4fb1-a93c-620ab9d667c6';
+        const ADMIN_USER_ID = 'cc00ee78-85e9-4b12-b4d6-a4868da95b52';
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // --- Global State ---
@@ -343,6 +347,7 @@
         // --- UI Elements ---
         const body = document.body;
         const toast = document.getElementById('toast');
+        const authWrapper = document.getElementById('auth-wrapper');
         const authContainer = document.getElementById('auth-container');
         const appWrapper = document.getElementById('app-wrapper');
         const postSignupMessage = document.getElementById('post-signup-message');
@@ -396,7 +401,7 @@
                 button.appendChild(spinner);
             } else {
                 button.disabled = false;
-                if(btnText) btnText.textContent = button.dataset.originalText;
+                if(btnText && button.dataset.originalText) btnText.textContent = button.dataset.originalText;
                 const spinner = button.querySelector('.spinner');
                 if (spinner) spinner.remove();
             }
@@ -416,20 +421,20 @@
             appWrapper.classList.remove('hidden');
             jobBoardContainer.classList.remove('hidden');
             profilePageContainer.classList.add('hidden');
-            authContainer.classList.add('hidden');
+            authWrapper.classList.add('hidden');
         };
 
         const showProfilePage = () => {
             appWrapper.classList.remove('hidden');
             jobBoardContainer.classList.add('hidden');
             profilePageContainer.classList.remove('hidden');
-            authContainer.classList.add('hidden');
+            authWrapper.classList.add('hidden');
             displayProfileData();
         };
 
         const showAuthPage = () => {
             appWrapper.classList.add('hidden');
-            authContainer.classList.remove('hidden');
+            authWrapper.classList.remove('hidden');
         };
 
         userProfileButton.addEventListener('click', showProfilePage);
@@ -660,9 +665,7 @@
                 
                 userProfileButton.classList.remove('hidden');
                 userProfileButton.classList.add('flex');
-                
-                body.classList.remove('flex', 'items-center', 'justify-center');
-                
+                                
                 showJobBoard(); 
                 updateJobListings();
 
@@ -670,8 +673,6 @@
                 currentUser = null;
                 userProfile = null;
                 
-                body.classList.add('flex', 'items-center', 'justify-center');
-
                 showAuthPage();
                 userProfileButton.classList.add('hidden');
             }
