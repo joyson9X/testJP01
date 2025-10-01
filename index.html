@@ -18,7 +18,7 @@
         .form-hidden { display: none; opacity: 0; transform: scale(0.95); }
         .form-visible { display: block; opacity: 1; transform: scale(1); }
         #auth-wrapper.hidden, #app-wrapper.hidden { display: none; }
-        .job-card {
+        .job-card, .news-card {
             opacity: 0;
             transform: translateY(20px);
             animation: cardFadeIn 0.5s ease-out forwards;
@@ -29,9 +29,14 @@
                 transform: translateY(0);
             }
         }
-        .filter-btn.active {
+        /* New Filter Tag Styles */
+        .filter-tag {
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .filter-tag.active {
             background-color: #4f46e5; /* indigo-600 */
             color: white;
+            border-color: #4f46e5;
         }
         /* Toast Notification Styles */
         #toast {
@@ -64,122 +69,122 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 min-h-screen">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
     <!-- Toast Notification Element -->
     <div id="toast"></div>
 
     <!-- Wrapper for Authentication Forms (Centered) -->
-    <div id="auth-wrapper" class="w-full min-h-screen flex items-center justify-center p-4">
-        <div id="auth-container" class="relative w-full max-w-md mx-auto bg-gray-800 text-white rounded-2xl shadow-2xl p-8 overflow-hidden">
+    <div id="auth-wrapper" class="w-full">
+        <div id="auth-container" class="relative w-full max-w-md mx-auto bg-white text-gray-900 rounded-2xl shadow-2xl p-8 overflow-hidden border border-gray-200">
             
             <!-- Post-Signup Message -->
             <div id="post-signup-message" class="hidden text-center">
-                <h2 class="text-2xl font-bold text-green-400">Success!</h2>
-                <p class="text-gray-300 mt-2">Please check your email for a confirmation link to complete your registration.</p>
+                <h2 class="text-2xl font-bold text-green-500">Success!</h2>
+                <p class="text-gray-600 mt-2">Please check your email for a confirmation link to complete your registration.</p>
             </div>
 
             <!-- Login Form -->
             <div id="login-form" class="form-transition form-visible">
                 <div class="text-center mb-8">
-                    <h1 class="text-3xl font-bold tracking-tight">Welcome Back!</h1>
-                    <p class="text-gray-400 mt-2">Sign in to continue to your account.</p>
+                    <h1 class="text-3xl font-bold tracking-tight text-gray-900">Welcome Back!</h1>
+                    <p class="text-gray-500 mt-2">Sign in to continue to your account.</p>
                 </div>
                 
                 <form id="login-form-element">
                     <div class="space-y-6">
                         <div>
-                            <label for="login-email" class="block text-sm font-medium text-gray-300">Email Address</label>
+                            <label for="login-email" class="block text-sm font-medium text-gray-700">Email Address</label>
                             <input type="email" id="login-email" name="email" placeholder="you@example.com" required
-                                   class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                                   class="mt-2 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 text-gray-900">
                         </div>
                         <div>
                             <div class="flex items-center justify-between">
-                                <label for="login-password" class="block text-sm font-medium text-gray-300">Password</label>
-                                <a href="#" class="text-sm font-medium text-indigo-400 hover:text-indigo-300">Forgot password?</a>
+                                <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
+                                <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Forgot password?</a>
                             </div>
                             <input type="password" id="login-password" name="password" placeholder="••••••••" required
-                                   class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                                   class="mt-2 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 text-gray-900">
                         </div>
                     </div>
                     
                     <div class="mt-8">
-                        <button type="submit"
-                                class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button type="submit" id="login-btn"
+                                class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                             <span class="btn-text">Sign In</span>
                         </button>
                     </div>
                 </form>
 
                 <div class="mt-6 relative">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-600"></div></div>
-                    <div class="relative flex justify-center text-sm"><span class="px-2 bg-gray-800 text-gray-400">Or continue with</span></div>
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300"></div></div>
+                    <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-gray-500">Or continue with</span></div>
                 </div>
 
                 <div class="mt-6">
                     <button id="google-signin-btn" type="button"
-                            class="w-full inline-flex justify-center py-3 px-4 border border-gray-600 rounded-lg shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
+                            class="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500 transition-colors">
                         <svg class="w-5 h-5 mr-2 -ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-76.2 76.2c-20.1-17.1-47.3-27.1-78.7-27.1-71.8 0-130 58.2-130 130s58.2 130 130 130c83.5 0 119.8-63.1 123.6-96.1H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>
                         Sign in with Google
                     </button>
                 </div>
 
-                <p class="mt-8 text-center text-sm text-gray-400">
+                <p class="mt-8 text-center text-sm text-gray-500">
                     Don't have an account? 
-                    <button id="show-signup" class="font-medium text-indigo-400 hover:text-indigo-300">Sign up</button>
+                    <button id="show-signup" class="font-medium text-indigo-600 hover:text-indigo-500">Sign up</button>
                 </p>
             </div>
 
             <!-- Signup Form -->
             <div id="signup-form" class="form-transition form-hidden">
                  <div class="text-center mb-8">
-                    <h1 class="text-3xl font-bold tracking-tight">Create an Account</h1>
-                    <p class="text-gray-400 mt-2">Get started with a free account today.</p>
+                    <h1 class="text-3xl font-bold tracking-tight text-gray-900">Create an Account</h1>
+                    <p class="text-gray-500 mt-2">Get started with a free account today.</p>
                 </div>
                 
                 <form id="signup-form-element">
                     <div class="space-y-6">
                         <div>
-                            <label for="signup-name" class="block text-sm font-medium text-gray-300">Full Name</label>
+                            <label for="signup-name" class="block text-sm font-medium text-gray-700">Full Name</label>
                             <input type="text" id="signup-name" name="name" placeholder="John Doe" required
-                                   class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                                   class="mt-2 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 text-gray-900">
                         </div>
                         <div>
-                            <label for="signup-email" class="block text-sm font-medium text-gray-300">Email Address</label>
+                            <label for="signup-email" class="block text-sm font-medium text-gray-700">Email Address</label>
                             <input type="email" id="signup-email" name="email" placeholder="you@example.com" required
-                                   class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                                   class="mt-2 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 text-gray-900">
                         </div>
                         <div>
-                            <label for="signup-password" class="block text-sm font-medium text-gray-300">Password</label>
+                            <label for="signup-password" class="block text-sm font-medium text-gray-700">Password</label>
                             <input type="password" id="signup-password" name="password" placeholder="Minimum 6 characters" required
-                                   class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                                   class="mt-2 block w-full bg-gray-100 border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 text-gray-900">
                         </div>
                     </div>
                     
                     <div class="mt-8">
-                        <button type="submit"
-                                class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button type="submit" id="signup-btn"
+                                class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                             <span class="btn-text">Create Account</span>
                         </button>
                     </div>
                 </form>
 
                 <div class="mt-6 relative">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-600"></div></div>
-                    <div class="relative flex justify-center text-sm"><span class="px-2 bg-gray-800 text-gray-400">Or sign up with</span></div>
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300"></div></div>
+                    <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-gray-500">Or sign up with</span></div>
                 </div>
 
                 <div class="mt-6">
                     <button id="google-signup-btn" type="button"
-                            class="w-full inline-flex justify-center py-3 px-4 border border-gray-600 rounded-lg shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
+                            class="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500 transition-colors">
                          <svg class="w-5 h-5 mr-2 -ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-76.2 76.2c-20.1-17.1-47.3-27.1-78.7-27.1-71.8 0-130 58.2-130 130s58.2 130 130 130c83.5 0 119.8-63.1 123.6-96.1H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>
                         Sign up with Google
                     </button>
                 </div>
 
-                <p class="mt-8 text-center text-sm text-gray-400">
+                <p class="mt-8 text-center text-sm text-gray-500">
                     Already have an account? 
-                    <button id="show-login" class="font-medium text-indigo-400 hover:text-indigo-300">Sign in</button>
+                    <button id="show-login" class="font-medium text-indigo-600 hover:text-indigo-500">Sign in</button>
                 </p>
             </div>
         </div>
@@ -187,145 +192,214 @@
     
     <!-- Wrapper for the main application -->
     <div id="app-wrapper" class="hidden w-full max-w-5xl mx-auto p-4">
-        <!-- Job Board Page -->
-        <div id="job-board-container" class="hidden w-full bg-gray-800 text-white rounded-2xl shadow-2xl p-8">
+        <!-- Main Application Container -->
+        <div class="bg-white text-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-200">
             <!-- Header -->
-            <div class="flex flex-col sm:flex-row justify-between sm:items-center pb-6 border-b border-gray-700 mb-6">
-                <h1 class="text-3xl font-bold tracking-tight mb-4 sm:mb-0">Job Board</h1>
-                <div class="flex items-center">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center pb-6 border-b border-gray-200 mb-6">
+                <nav class="flex items-center space-x-4">
+                     <button id="nav-jobs" class="text-lg font-bold tracking-tight text-gray-900">Explore Jobs</button>
+                     <button id="nav-news" class="text-lg font-medium text-gray-500 hover:text-gray-900">News</button>
+                </nav>
+                <div class="flex items-center mt-4 sm:mt-0">
                     <button id="show-admin-panel-btn" class="hidden mr-4 py-2 px-4 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg">Post Job</button>
                     <button id="user-profile-button" class="hidden items-center mr-4 cursor-pointer group">
-                        <span id="user-name-display" class="text-gray-300 group-hover:text-white font-medium mr-3 text-sm"></span>
-                        <img id="user-pfp" src="" alt="User Profile Picture" class="w-9 h-9 rounded-full bg-gray-700 border-2 border-gray-600 group-hover:border-indigo-400">
+                        <span id="user-name-display" class="text-gray-600 group-hover:text-gray-900 font-medium mr-3 text-sm"></span>
+                        <img id="user-pfp" src="" alt="User Profile Picture" class="w-9 h-9 rounded-full bg-gray-200 border-2 border-gray-300 group-hover:border-indigo-500">
                     </button>
-                    <button id="logout-btn" class="w-full sm:w-auto flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Logout</button>
                 </div>
             </div>
-            <div id="job-board-content">
-                <!-- Admin "Add Job" Panel (Hidden by default) -->
-                <div id="admin-panel" class="hidden bg-gray-700 p-6 rounded-lg mb-8">
-                    <h2 class="text-xl font-bold mb-4 text-white">Admin: Post a New Job</h2>
-                    <form id="add-job-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input name="title" required placeholder="Job Title" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
-                        <input name="company" required placeholder="Company Name" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
-                        <input name="location" required placeholder="Location" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
-                        <input name="salary" placeholder="Salary e.g., $50/hr" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
-                        <select name="type" class="bg-gray-800 text-white rounded p-2 border border-gray-600">
-                            <option>Remote</option>
-                            <option>On-site</option>
-                            <option>Hybrid</option>
-                        </select>
-                        <select name="experience" class="bg-gray-800 text-white rounded p-2 border border-gray-600">
-                            <option>Entry</option>
-                            <option>Intermediate</option>
-                            <option>Expert</option>
-                        </select>
-                        <input name="logo_url" placeholder="Company Logo URL" class="md:col-span-2 bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
-                        <textarea name="description" placeholder="Job Description" class="md:col-span-2 bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400"></textarea>
-                        <button type="submit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center disabled:opacity-50">
-                            <span class="btn-text">Post Job</span>
+
+            <!-- Job Board Page -->
+            <div id="job-board-container" class="hidden">
+                <div id="job-board-content">
+                    <!-- Admin "Add Job" Panel (Hidden by default) -->
+                    <div id="admin-panel" class="hidden bg-gray-100 p-6 rounded-lg mb-8">
+                        <h2 class="text-xl font-bold mb-4 text-gray-900">Admin: Post a New Job</h2>
+                        <form id="add-job-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input name="title" required placeholder="Job Title" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                            <input name="company" required placeholder="Company Name" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                            <input name="location" required placeholder="Location" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                            <input name="salary" placeholder="Salary e.g., $50/hr" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                             <div>
+                                <label for="add-deadline" class="block text-sm font-medium text-gray-700">Application Deadline</label>
+                                <input name="deadline" id="add-deadline" type="date" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500 w-full mt-1">
+                            </div>
+                            <select name="type" class="bg-white text-gray-900 rounded p-2 border border-gray-300 self-end">
+                                <option>Remote</option>
+                                <option>On-site</option>
+                                <option>Hybrid</option>
+                            </select>
+                            <select name="experience" class="bg-white text-gray-900 rounded p-2 border border-gray-300 self-end">
+                                <option>Entry</option>
+                                <option>Intermediate</option>
+                                <option>Expert</option>
+                            </select>
+                            <input name="logo_url" placeholder="Company Logo URL" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                             <input name="apply_url" placeholder="External Application URL" class="md:col-span-2 bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                            <textarea name="description" placeholder="Job Description" class="md:col-span-2 bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500"></textarea>
+                            <button type="submit" id="add-job-btn" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center disabled:opacity-50">
+                                <span class="btn-text">Post Job</span>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Admin "Edit Job" Panel (Hidden by default) -->
+                    <div id="edit-panel" class="hidden bg-gray-100 p-6 rounded-lg mb-8">
+                        <h2 class="text-xl font-bold mb-4 text-gray-900">Admin: Edit Job Post</h2>
+                        <form id="edit-job-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="hidden" name="id">
+                            <input name="title" required placeholder="Job Title" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                            <input name="company" required placeholder="Company Name" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                            <input name="location" required placeholder="Location" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                            <input name="salary" placeholder="Salary e.g., $50/hr" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                             <div>
+                                <label for="edit-deadline" class="block text-sm font-medium text-gray-700">Application Deadline</label>
+                                <input name="deadline" id="edit-deadline" type="date" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500 w-full mt-1">
+                            </div>
+                            <select name="type" class="bg-white text-gray-900 rounded p-2 border border-gray-300 self-end">
+                                <option>Remote</option>
+                                <option>On-site</option>
+                                <option>Hybrid</option>
+                            </select>
+                            <select name="experience" class="bg-white text-gray-900 rounded p-2 border border-gray-300 self-end">
+                                <option>Entry</option>
+                                <option>Intermediate</option>
+                                <option>Expert</option>
+                            </select>
+                            <input name="logo_url" placeholder="Company Logo URL" class="bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                            <input name="apply_url" placeholder="External Application URL" class="md:col-span-2 bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                            <textarea name="description" placeholder="Job Description" class="md:col-span-2 bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500"></textarea>
+                            <div class="md:col-span-2 flex items-center gap-4">
+                                <button type="submit" id="update-job-btn" class="flex-grow bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center disabled:opacity-50">
+                                    <span class="btn-text">Update Job</span>
+                                </button>
+                                <button type="button" id="cancel-edit-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Search and Filters -->
+                    <div class="space-y-6 mb-8">
+                        <div class="relative">
+                            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="text" id="search-input" placeholder="Search by job title, company..." class="w-full bg-gray-50 border-gray-300 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 pl-12 text-gray-900">
+                        </div>
+
+                        <div id="filters-container" class="space-y-4">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-sm font-medium text-gray-500 mr-2">Type:</span>
+                                <button class="filter-tag text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full border border-gray-300" data-group="type" data-value="Remote">Remote</button>
+                                <button class="filter-tag text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full border border-gray-300" data-group="type" data-value="On-site">On-site</button>
+                                <button class="filter-tag text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full border border-gray-300" data-group="type" data-value="Hybrid">Hybrid</button>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-sm font-medium text-gray-500 mr-2">Experience:</span>
+                                <button class="filter-tag text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full border border-gray-300" data-group="experience" data-value="Entry">Entry</button>
+                                <button class="filter-tag text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full border border-gray-300" data-group="experience" data-value="Intermediate">Intermediate</button>
+                                <button class="filter-tag text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full border border-gray-300" data-group="experience" data-value="Expert">Expert</button>
+                            </div>
+                        </div>
+                         <div class="flex justify-end">
+                             <button id="reset-filters-btn" class="text-sm text-gray-500 hover:text-gray-900">Reset Filters</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Job Listings -->
+                    <div id="job-listings" class="space-y-6"></div>
+                </div>
+            </div>
+
+            <!-- News Page -->
+            <div id="news-page-container" class="hidden">
+                 <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Global News</h2>
+                    <button id="show-post-news-btn" class="hidden py-2 px-4 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg">Post News</button>
+                </div>
+                <div id="post-news-panel" class="hidden bg-gray-100 p-6 rounded-lg mb-8">
+                    <h2 class="text-xl font-bold mb-4 text-gray-900">Admin: Post a New Article</h2>
+                    <form id="add-news-form" class="space-y-4">
+                        <input name="heading" required placeholder="Article Heading" class="w-full bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                        <input name="image_url" placeholder="Image URL (optional)" class="w-full bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                        <textarea name="body" placeholder="Article body (short summary)" class="w-full bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500" rows="3"></textarea>
+                        <input name="read_more_url" required placeholder="https://example.com/full-article" class="w-full bg-white text-gray-900 rounded p-2 border border-gray-300 placeholder-gray-500">
+                        <button type="submit" id="add-news-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center disabled:opacity-50">
+                            <span class="btn-text">Post Article</span>
                         </button>
                     </form>
                 </div>
-                
-                <!-- Admin "Edit Job" Panel (Hidden by default) -->
-                <div id="edit-panel" class="hidden bg-gray-700 p-6 rounded-lg mb-8">
-                    <h2 class="text-xl font-bold mb-4 text-white">Admin: Edit Job Post</h2>
-                    <form id="edit-job-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="hidden" name="id">
-                        <input name="title" required placeholder="Job Title" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
-                        <input name="company" required placeholder="Company Name" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
-                        <input name="location" required placeholder="Location" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
-                        <input name="salary" placeholder="Salary e.g., $50/hr" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
-                        <select name="type" class="bg-gray-800 text-white rounded p-2 border border-gray-600">
-                            <option>Remote</option>
-                            <option>On-site</option>
-                            <option>Hybrid</option>
-                        </select>
-                        <select name="experience" class="bg-gray-800 text-white rounded p-2 border border-gray-600">
-                            <option>Entry</option>
-                            <option>Intermediate</option>
-                            <option>Expert</option>
-                        </select>
-                        <input name="logo_url" placeholder="Company Logo URL" class="md:col-span-2 bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
-                        <textarea name="description" placeholder="Job Description" class="md:col-span-2 bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400"></textarea>
-                        <div class="md:col-span-2 flex items-center gap-4">
-                            <button type="submit" class="flex-grow bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center disabled:opacity-50">
-                                <span class="btn-text">Update Job</span>
-                            </button>
-                            <button type="button" id="cancel-edit-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Search and Filters -->
-                <div class="flex flex-col md:flex-row gap-4 mb-8">
-                    <div class="relative flex-grow">
-                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="search-input" placeholder="Search for jobs, companies..." class="w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 pl-12">
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <button class="filter-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-2 px-4 rounded-lg text-sm transition-colors" data-filter="all">All</button>
-                        <button class="filter-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-2 px-4 rounded-lg text-sm transition-colors" data-filter="Remote">Remote</button>
-                        <button class="filter-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-2 px-4 rounded-lg text-sm transition-colors" data-filter="On-site">On-site</button>
-                    </div>
-                </div>
-
-                <!-- Job Listings -->
-                <div id="job-listings" class="space-y-6">
-                    <!-- Job cards will be dynamically inserted here -->
+                 <div id="news-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- News articles will be inserted here -->
                 </div>
             </div>
-        </div>
 
-        <!-- User Profile Page -->
-        <div id="profile-page-container" class="hidden w-full bg-gray-800 text-white rounded-2xl shadow-2xl p-8">
-            <div class="flex justify-between items-center pb-6 border-b border-gray-700 mb-6">
-                 <h1 class="text-3xl font-bold tracking-tight">My Profile</h1>
-                 <button id="back-to-jobs-btn" class="py-2 px-4 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg">Back to Jobs</button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Left Column: PFP and Resume -->
-                <div class="md:col-span-1 space-y-6">
-                    <div class="text-center">
-                        <img id="profile-pfp" src="" class="w-32 h-32 rounded-full mx-auto bg-gray-700 border-4 border-gray-600">
-                        <p id="profile-name" class="text-xl font-bold mt-4"></p>
-                        <p id="profile-email" class="text-sm text-gray-400"></p>
-                    </div>
-                    <div class="bg-gray-700 p-4 rounded-lg">
-                        <h3 class="font-semibold mb-2">Resume</h3>
-                        <div id="resume-status"></div>
-                        <input type="file" id="resume-upload-input" class="hidden" accept=".pdf,.doc,.docx">
-                        <button id="upload-resume-btn" class="w-full text-center py-2 px-4 mt-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg flex items-center justify-center disabled:opacity-50">
-                           <span class="btn-text">Upload Resume</span>
-                        </button>
-                    </div>
+            <!-- User Profile Page -->
+            <div id="profile-page-container" class="hidden">
+                <div class="flex justify-between items-center pb-6 border-b border-gray-200 mb-6">
+                     <h1 class="text-3xl font-bold tracking-tight text-gray-900">My Profile</h1>
+                     <button id="back-to-jobs-btn-profile" class="py-2 px-4 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg">Back to Main</button>
                 </div>
 
-                <!-- Right Column: Details Form -->
-                <div class="md:col-span-2">
-                    <form id="profile-form">
-                        <div class="space-y-6">
-                             <div>
-                                <label for="profile-full-name" class="block text-sm font-medium text-gray-300">Full Name</label>
-                                <input type="text" name="full_name" id="profile-full-name" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Left Column: PFP and Resume -->
+                    <div class="md:col-span-1 space-y-6">
+                        <div class="text-center">
+                            <div class="relative w-32 h-32 mx-auto">
+                                <img id="profile-pfp" src="" class="w-32 h-32 rounded-full bg-gray-200 border-4 border-gray-300 object-cover">
+                                <label for="pfp-upload-input" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                </label>
+                                <input type="file" id="pfp-upload-input" class="hidden" accept="image/png, image/jpeg, image/jpg">
                             </div>
-                             <div>
-                                <label for="profile-headline" class="block text-sm font-medium text-gray-300">Headline</label>
-                                <input type="text" name="headline" id="profile-headline" placeholder="e.g. Senior Product Designer" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white">
-                            </div>
-                            <div>
-                                <label for="profile-bio" class="block text-sm font-medium text-gray-300">Bio</label>
-                                <textarea name="bio" id="profile-bio" rows="4" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white"></textarea>
-                            </div>
+                            <p id="profile-name" class="text-xl font-bold mt-4 text-gray-900"></p>
+                            <p id="profile-email" class="text-sm text-gray-500"></p>
                         </div>
-                        <div class="mt-6">
-                             <button type="submit" class="py-2 px-4 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg flex items-center justify-center disabled:opacity-50">
-                                <span class="btn-text">Save Changes</span>
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <h3 class="font-semibold mb-2 text-gray-900">Resume</h3>
+                            <div id="resume-status"></div>
+                            <input type="file" id="resume-upload-input" class="hidden" accept=".pdf,.doc,.docx">
+                            <button id="upload-resume-btn" class="w-full text-center py-2 px-4 mt-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg flex items-center justify-center disabled:opacity-50">
+                               <span class="btn-text">Upload Resume</span>
                             </button>
                         </div>
-                    </form>
+                        <div>
+                            <button id="logout-btn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">Logout</button>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Details Form -->
+                    <div class="md:col-span-2">
+                        <form id="profile-form">
+                            <div class="space-y-6">
+                                 <div>
+                                    <label for="profile-full-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                                    <input type="text" name="full_name" id="profile-full-name" class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg p-2 text-gray-900">
+                                </div>
+                                 <div>
+                                    <label for="profile-headline" class="block text-sm font-medium text-gray-700">Headline</label>
+                                    <input type="text" name="headline" id="profile-headline" placeholder="e.g. Senior Product Designer" class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg p-2 text-gray-900">
+                                </div>
+                                <div>
+                                    <label for="profile-bio" class="block text-sm font-medium text-gray-700">Bio</label>
+                                    <textarea name="bio" id="profile-bio" rows="4" class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-lg p-2 text-gray-900"></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                 <button type="submit" id="save-profile-btn" class="py-2 px-4 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg flex items-center justify-center disabled:opacity-50">
+                                    <span class="btn-text">Save Changes</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Job Detail Page -->
+            <div id="job-detail-container" class="hidden">
+                 <div class="flex justify-between items-center pb-6 border-b border-gray-200 mb-6">
+                     <button id="back-to-jobs-btn-detail" class="py-2 px-4 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg">← Back to Jobs</button>
+                </div>
+                <div id="job-detail-content">
+                    <!-- Detailed job content will be inserted here -->
                 </div>
             </div>
         </div>
@@ -343,22 +417,39 @@
         let allJobs = [];
         let currentUser = null;
         let userProfile = null;
+        let appliedJobIds = new Set();
         
         // --- UI Elements ---
         const body = document.body;
         const toast = document.getElementById('toast');
         const authWrapper = document.getElementById('auth-wrapper');
-        const authContainer = document.getElementById('auth-container');
         const appWrapper = document.getElementById('app-wrapper');
         const postSignupMessage = document.getElementById('post-signup-message');
+        
+        const navJobs = document.getElementById('nav-jobs');
+        const navNews = document.getElementById('nav-news');
+
         const jobBoardContainer = document.getElementById('job-board-container');
+        const newsPageContainer = document.getElementById('news-page-container');
+        const newsContent = document.getElementById('news-content');
+        const showPostNewsBtn = document.getElementById('show-post-news-btn');
+        const postNewsPanel = document.getElementById('post-news-panel');
+        const addNewsForm = document.getElementById('add-news-form');
+        const addNewsBtn = document.getElementById('add-news-btn');
+        const profilePageContainer = document.getElementById('profile-page-container');
+        const jobDetailContainer = document.getElementById('job-detail-container');
+        const jobDetailContent = document.getElementById('job-detail-content');
+
         const userProfileButton = document.getElementById('user-profile-button');
         const userNameDisplay = document.getElementById('user-name-display');
         const userPfp = document.getElementById('user-pfp');
-        const profilePageContainer = document.getElementById('profile-page-container');
-        const backToJobsBtn = document.getElementById('back-to-jobs-btn');
+
+        const backToJobsBtnProfile = document.getElementById('back-to-jobs-btn-profile');
+        const backToJobsBtnDetail = document.getElementById('back-to-jobs-btn-detail');
         const profileForm = document.getElementById('profile-form');
+        const saveProfileBtn = document.getElementById('save-profile-btn');
         const profilePfp = document.getElementById('profile-pfp');
+        const pfpUploadInput = document.getElementById('pfp-upload-input');
         const profileName = document.getElementById('profile-name');
         const profileEmail = document.getElementById('profile-email');
         const resumeStatusDiv = document.getElementById('resume-status');
@@ -366,15 +457,20 @@
         const resumeUploadInput = document.getElementById('resume-upload-input');
         const jobListingsContainer = document.getElementById('job-listings');
         const searchInput = document.getElementById('search-input');
-        const filterButtons = document.querySelectorAll('.filter-btn');
+        const filtersContainer = document.getElementById('filters-container');
+        const resetFiltersBtn = document.getElementById('reset-filters-btn');
         const adminPanel = document.getElementById('admin-panel');
         const showAdminPanelBtn = document.getElementById('show-admin-panel-btn');
         const addJobForm = document.getElementById('add-job-form');
+        const addJobBtn = document.getElementById('add-job-btn');
         const editPanel = document.getElementById('edit-panel');
         const editJobForm = document.getElementById('edit-job-form');
+        const updateJobBtn = document.getElementById('update-job-btn');
         const cancelEditBtn = document.getElementById('cancel-edit-btn');
         const loginFormEl = document.getElementById('login-form-element');
+        const loginBtn = document.getElementById('login-btn');
         const signupFormEl = document.getElementById('signup-form-element');
+        const signupBtn = document.getElementById('signup-btn');
         const logoutBtn = document.getElementById('logout-btn');
         const showSignupBtn = document.getElementById('show-signup');
         const showLoginBtn = document.getElementById('show-login');
@@ -407,7 +503,6 @@
             }
         };
         
-        // Store original button text
         document.querySelectorAll('button[type="submit"], #upload-resume-btn').forEach(btn => {
             const btnText = btn.querySelector('.btn-text');
             if (btnText) {
@@ -415,44 +510,228 @@
             }
         });
 
-
         // --- Navigation Functions ---
-        const showJobBoard = () => {
-            appWrapper.classList.remove('hidden');
-            jobBoardContainer.classList.remove('hidden');
-            profilePageContainer.classList.add('hidden');
+        const showPage = (page) => {
             authWrapper.classList.add('hidden');
-        };
-
-        const showProfilePage = () => {
-            appWrapper.classList.remove('hidden');
-            jobBoardContainer.classList.add('hidden');
-            profilePageContainer.classList.remove('hidden');
-            authWrapper.classList.add('hidden');
-            displayProfileData();
-        };
-
-        const showAuthPage = () => {
             appWrapper.classList.add('hidden');
-            authWrapper.classList.remove('hidden');
+            jobBoardContainer.classList.add('hidden');
+            profilePageContainer.classList.add('hidden');
+            newsPageContainer.classList.add('hidden');
+            jobDetailContainer.classList.add('hidden');
+            
+            navJobs.classList.remove('font-bold', 'text-gray-900');
+            navJobs.classList.add('font-medium', 'text-gray-500', 'hover:text-gray-900');
+            navNews.classList.remove('font-bold', 'text-gray-900');
+            navNews.classList.add('font-medium', 'text-gray-500', 'hover:text-gray-900');
+
+
+            if (page === 'auth') {
+                authWrapper.classList.remove('hidden');
+                body.classList.add('flex', 'items-center', 'justify-center');
+            } else {
+                appWrapper.classList.remove('hidden');
+                body.classList.remove('flex', 'items-center', 'justify-center');
+                if (page === 'jobs') {
+                    jobBoardContainer.classList.remove('hidden');
+                    navJobs.classList.add('font-bold', 'text-gray-900');
+                    navJobs.classList.remove('font-medium', 'text-gray-500', 'hover:text-gray-900');
+                } else if (page === 'profile') {
+                    profilePageContainer.classList.remove('hidden');
+                    displayProfileData();
+                } else if (page === 'news') {
+                    newsPageContainer.classList.remove('hidden');
+                     navNews.classList.add('font-bold', 'text-gray-900');
+                    navNews.classList.remove('font-medium', 'text-gray-500', 'hover:text-gray-900');
+                    fetchGlobalNews();
+                } else if (page === 'job-detail') {
+                    jobDetailContainer.classList.remove('hidden');
+                }
+            }
         };
 
-        userProfileButton.addEventListener('click', showProfilePage);
-        backToJobsBtn.addEventListener('click', showJobBoard);
+        navJobs.addEventListener('click', () => showPage('jobs'));
+        navNews.addEventListener('click', () => showPage('news'));
+        userProfileButton.addEventListener('click', () => showPage('profile'));
+        backToJobsBtnProfile.addEventListener('click', () => showPage('jobs'));
+        backToJobsBtnDetail.addEventListener('click', () => showPage('jobs'));
+
+        // --- News Functions ---
+        const fetchGlobalNews = async () => {
+            newsContent.innerHTML = `<div class="col-span-full flex justify-center py-10"><div class="spinner !w-8 !h-8"></div></div>`;
+            
+            const fetchWebNews = async () => {
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: "Fetch the top 5 latest business and corporate news headlines. For each, provide title, a brief 1-2 sentence summary, source name, a direct URL to the article, and a relevant image URL." }] }],
+                    tools: [{ "google_search": {} }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT", properties: {
+                                "articles": {
+                                    type: "ARRAY", items: {
+                                        type: "OBJECT", properties: {
+                                            "title": { "type": "STRING" }, "summary": { "type": "STRING" }, "source": { "type": "STRING" }, "url": { "type": "STRING" }, "image_url": { "type": "STRING" }
+                                        }, required: ["title", "summary", "source", "url"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) return [];
+                    const result = await response.json();
+                    const jsonText = result.candidates[0].content.parts[0].text;
+                    const data = JSON.parse(jsonText);
+                    return data.articles || [];
+                } catch (e) {
+                    console.error("Error fetching web news:", e);
+                    return [];
+                }
+            };
+            
+            const fetchCustomNews = async () => {
+                const { data, error } = await _supabase.from('news').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    console.error("Error fetching custom news:", error);
+                    return [];
+                }
+                return data.map(n => ({ title: n.heading, summary: n.body, url: n.read_more_url, source: 'Latest Update', image_url: n.image_url }));
+            };
+
+            const [customNewsResult, webNewsResult] = await Promise.allSettled([fetchCustomNews(), fetchWebNews()]);
+
+            const customNews = customNewsResult.status === 'fulfilled' ? customNewsResult.value : [];
+            const webNews = webNewsResult.status === 'fulfilled' ? webNewsResult.value : [];
+
+            const allNews = [...customNews, ...webNews];
+            
+            newsContent.innerHTML = '';
+            if (allNews.length > 0) {
+                allNews.forEach((article, index) => {
+                    const sourcePill = article.source === 'Latest Update'
+                        ? `<span class="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">${article.source}</span>`
+                        : `<span class="text-sm text-gray-500 font-medium">${article.source}</span>`;
+                    
+                    const imageHtml = article.image_url 
+                        ? `<img src="${article.image_url}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/64748b?text=News';" alt="Article image" class="w-full h-40 object-cover rounded-t-lg">`
+                        : '';
+
+                    const articleCard = `
+                        <div class="news-card flex flex-col bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden" style="animation-delay: ${index * 80}ms">
+                            ${imageHtml}
+                            <div class="p-6 flex flex-col flex-grow">
+                                <h3 class="text-lg font-bold text-gray-900 flex-grow">${article.title}</h3>
+                                <p class="text-gray-600 mt-2 text-sm">${article.summary || ''}</p>
+                                <div class="mt-4 flex justify-between items-center">
+                                    ${sourcePill}
+                                    <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="text-sm text-indigo-600 hover:underline">Read More →</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    newsContent.innerHTML += articleCard;
+                });
+            } else {
+                newsContent.innerHTML = `<p class="col-span-full text-center text-gray-500 py-10">Could not fetch any news at this time.</p>`;
+            }
+        };
+
+        showPostNewsBtn.addEventListener('click', () => postNewsPanel.classList.toggle('hidden'));
+        
+        addNewsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setLoadingState(addNewsBtn, true);
+            const formData = new FormData(addNewsForm);
+            const newsData = Object.fromEntries(formData.entries());
+
+            const { error } = await _supabase.from('news').insert([newsData]);
+            if (error) {
+                showToast('Error posting article: ' + error.message, true);
+            } else {
+                showToast('Article posted successfully!');
+                addNewsForm.reset();
+                postNewsPanel.classList.add('hidden');
+                fetchGlobalNews();
+            }
+            setLoadingState(addNewsBtn, false);
+        });
+
+        
+        // --- Date Formatting ---
+        const formatDeadline = (dateString) => {
+            if (!dateString) return { text: 'N/A', class: 'text-gray-500' };
+            const deadline = new Date(dateString);
+            const today = new Date();
+            today.setHours(0,0,0,0); 
+            deadline.setUTCHours(0,0,0,0); // Use UTC hours to compare dates correctly
+            const diffTime = deadline - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) {
+                return { text: 'Expired', class: 'text-red-500' };
+            }
+            if (diffDays <= 7) {
+                return { text: `Expires in ${diffDays} days`, class: 'text-yellow-500' };
+            }
+            return { text: `Apply by ${new Date(dateString).toLocaleDateString()}`, class: 'text-gray-500' };
+        };
+        
+        // --- Job Application Functions ---
+        const fetchAppliedJobs = async () => {
+            if (!currentUser) return;
+            const { data, error } = await _supabase.from('applications').select('job_id').eq('user_id', currentUser.id);
+            if (error) {
+                console.error("Error fetching applications:", error);
+                return;
+            }
+            appliedJobIds = new Set(data.map(app => app.job_id));
+        };
+
+        const handleApply = async (jobId, applyUrl) => {
+             if (appliedJobIds.has(jobId)) {
+                showToast("You have already applied for this job.", true);
+                return;
+            }
+            
+            const { error } = await _supabase.from('applications').insert({ user_id: currentUser.id, job_id: jobId });
+
+            if (error) {
+                showToast("Error submitting application: " + error.message, true);
+                return;
+            }
+
+            appliedJobIds.add(jobId);
+            showToast("Application submitted successfully!");
+            displayJobDetail(jobId); // Re-render detail view to update button
+            displayJobs(); // Re-render job list to show badge
+
+            if (applyUrl) {
+                window.open(applyUrl, '_blank');
+            }
+        };
 
 
         // --- Job Board Functions ---
-        const displayJobs = async (searchTerm = '', filter = 'all') => {
+        const displayJobs = async () => {
             jobListingsContainer.innerHTML = `<div class="flex justify-center py-10"><div class="spinner !w-8 !h-8"></div></div>`;
             
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedTypes = Array.from(filtersContainer.querySelectorAll('.filter-tag[data-group="type"].active')).map(el => el.dataset.value);
+            const selectedExperience = Array.from(filtersContainer.querySelectorAll('.filter-tag[data-group="experience"].active')).map(el => el.dataset.value);
+
             let query = _supabase.from('Jobs').select('*').order('created_at', { ascending: false });
 
-            const searchLower = searchTerm.toLowerCase();
-            if (searchLower) {
-                 query = query.or(`title.ilike.%${searchLower}%,company.ilike.%${searchLower}%`);
+            if (searchTerm) {
+                 query = query.or(`title.ilike.%${searchTerm}%,company.ilike.%${searchTerm}%`);
             }
-            if (filter !== 'all') {
-                query = query.eq('type', filter);
+            if (selectedTypes.length > 0) {
+                query = query.in('type', selectedTypes);
+            }
+            if (selectedExperience.length > 0) {
+                query = query.in('experience', selectedExperience);
             }
 
             const { data: jobs, error } = await query;
@@ -468,47 +747,35 @@
             jobListingsContainer.innerHTML = '';
 
             if (jobs.length === 0) {
-                jobListingsContainer.innerHTML = `<p class="text-center text-gray-400 py-10">No jobs found.</p>`;
+                jobListingsContainer.innerHTML = `<p class="text-center text-gray-500 py-10">No jobs found matching your criteria.</p>`;
                 return;
             }
             
             jobs.forEach((job, index) => {
-                const logoHtml = job.logo_url
-                    ? `<img src="${job.logo_url}" alt="${job.company} logo" class="w-12 h-12 rounded-lg object-cover bg-gray-700 flex-shrink-0">`
-                    : `<div class="w-12 h-12 rounded-lg bg-gray-800 flex-shrink-0 flex items-center justify-center">
-                           <svg class="w-8 h-8 text-indigo-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                       </div>`;
-
-                const adminActionsHtml = (currentUser?.id === ADMIN_USER_ID)
-                    ? `<div class="flex items-center gap-2">
-                           <button class="edit-job-btn text-sm text-yellow-400 hover:text-yellow-300 font-medium" data-job-id="${job.id}">Edit</button>
-                       </div>`
-                    : '';
-
+                const deadlineInfo = formatDeadline(job.deadline);
+                const isApplied = appliedJobIds.has(job.id);
                 const jobCard = `
-                    <div class="job-card bg-gray-700 p-6 rounded-lg shadow-md hover:bg-gray-600/50 transition-colors" style="animation-delay: ${index * 80}ms">
+                    <div class="job-card bg-white p-6 rounded-lg shadow-md hover:bg-gray-50 transition-colors border border-gray-200 cursor-pointer" style="animation-delay: ${index * 80}ms" data-job-id="${job.id}">
                         <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
                              <div class="flex items-center gap-4 flex-grow">
-                                ${logoHtml}
+                                <img src="${job.logo_url || 'https://placehold.co/48x48/e2e8f0/64748b?text=??'}" alt="${job.company} logo" class="w-12 h-12 rounded-lg object-cover bg-gray-200 flex-shrink-0">
                                 <div>
-                                    <h3 class="text-xl font-bold text-white">${job.title || ''}</h3>
-                                    <p class="text-indigo-400 font-medium">${job.company || ''}</p>
-                                    <div class="flex items-center flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-400">
+                                    <h3 class="text-xl font-bold text-gray-900">${job.title || ''}</h3>
+                                    <p class="text-indigo-600 font-medium">${job.company || ''}</p>
+                                    <div class="flex items-center flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-500">
                                         <span class="flex items-center gap-1.5">
                                             <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                             ${job.location || ''}
                                         </span>
-                                        <span class="inline-flex items-center rounded-md bg-gray-600 px-2 py-1 text-xs font-medium text-gray-300 ring-1 ring-inset ring-gray-500/10">
+                                        <span class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
                                             ${job.type || ''}
                                         </span>
-                                         <span class="font-semibold">${job.salary || ''}</span>
+                                         <span class="font-semibold text-gray-800">${job.salary || ''}</span>
+                                          <span class="font-semibold ${deadlineInfo.class}">${deadlineInfo.text}</span>
                                     </div>
                                  </div>
                              </div>
-                             <div class="flex flex-col sm:items-end gap-3 flex-shrink-0 w-full sm:w-auto">
-                                <button class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors">Apply Now</button>
-                                ${adminActionsHtml}
-                             </div>
+                             ${isApplied ? '<span class="flex-shrink-0 text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">APPLIED</span>' : ''}
                         </div>
                     </div>
                 `;
@@ -516,22 +783,90 @@
             });
         };
 
-        const updateJobListings = () => {
-            const searchTerm = searchInput.value;
-            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-            displayJobs(searchTerm, activeFilter);
+        const displayJobDetail = (jobId) => {
+            const job = allJobs.find(j => j.id == jobId);
+            if (!job) {
+                showToast('Could not find job details.', true);
+                return;
+            }
+            
+            const deadlineInfo = formatDeadline(job.deadline);
+            const isApplied = appliedJobIds.has(job.id);
+
+            const adminActionsHtml = (currentUser?.id === ADMIN_USER_ID)
+                ? `<button class="edit-job-btn-detail text-sm text-yellow-500 hover:text-yellow-600 font-medium" data-job-id="${job.id}">Edit Job</button>`
+                : '';
+
+            let applyButtonHtml;
+            if (isApplied) {
+                applyButtonHtml = `<button class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed" disabled>✓ Applied</button>`;
+            } else if (job.apply_url) {
+                applyButtonHtml = `<button data-job-id="${job.id}" data-apply-url="${job.apply_url}" class="apply-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg">Apply Now</button>`;
+            } else {
+                 applyButtonHtml = `<button data-job-id="${job.id}" class="apply-btn bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg">Apply</button>`;
+            }
+
+
+            jobDetailContent.innerHTML = `
+                <div class="flex items-center gap-4 mb-6">
+                    <img src="${job.logo_url || 'https://placehold.co/64x64/e2e8f0/64748b?text=??'}" alt="${job.company} logo" class="w-16 h-16 rounded-xl object-cover bg-gray-200 flex-shrink-0">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">${job.title}</h2>
+                        <p class="text-lg text-indigo-600 font-medium">${job.company}</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-x-6 gap-y-2 text-gray-600 mb-6">
+                    <span class="font-semibold">Location:</span> ${job.location}
+                    <span class="font-semibold">Type:</span> ${job.type}
+                    <span class="font-semibold">Experience:</span> ${job.experience}
+                    <span class="font-semibold">Salary:</span> ${job.salary}
+                     <span class="font-semibold">Deadline: <span class="${deadlineInfo.class}">${deadlineInfo.text}</span></span>
+                </div>
+                <div class="prose max-w-none text-gray-700">
+                    <h3 class="font-bold">Job Description</h3>
+                    <p>${(job.description || '').replace(/\n/g, '<br>')}</p>
+                </div>
+                <div class="mt-8 flex items-center gap-4">
+                    ${applyButtonHtml}
+                    ${adminActionsHtml}
+                </div>
+            `;
+            showPage('job-detail');
         };
 
-        searchInput.addEventListener('input', updateJobListings);
-
-        filterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                updateJobListings();
-            });
+        jobListingsContainer.addEventListener('click', (e) => {
+            const card = e.target.closest('.job-card');
+            if (card) {
+                displayJobDetail(card.dataset.jobId);
+            }
         });
-        document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+        
+        jobDetailContent.addEventListener('click', (e) => {
+            const editBtn = e.target.closest('.edit-job-btn-detail');
+            const applyBtn = e.target.closest('.apply-btn');
+            if (editBtn) {
+                showPage('jobs'); // Go back to job list to show the edit panel
+                openEditPanel(editBtn.dataset.jobId);
+            }
+            if(applyBtn) {
+                handleApply(parseInt(applyBtn.dataset.jobId), applyBtn.dataset.applyUrl);
+            }
+        });
+
+
+        searchInput.addEventListener('input', displayJobs);
+        filtersContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-tag')) {
+                e.target.classList.toggle('active');
+                displayJobs();
+            }
+        });
+        resetFiltersBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            filtersContainer.querySelectorAll('.filter-tag').forEach(el => el.classList.remove('active'));
+            displayJobs();
+        });
+
         
         const openEditPanel = (jobId) => {
             const jobToEdit = allJobs.find(j => j.id == jobId);
@@ -547,13 +882,6 @@
             window.scrollTo(0, 0);
         };
 
-        jobListingsContainer.addEventListener('click', (e) => {
-            const editBtn = e.target.closest('.edit-job-btn');
-            if (editBtn) {
-                openEditPanel(editBtn.dataset.jobId);
-            }
-        });
-        
         cancelEditBtn.addEventListener('click', () => {
             editPanel.classList.add('hidden');
         });
@@ -573,6 +901,7 @@
             const pfpUrl = metadata.avatar_url || `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZHRoPSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MDkyYmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOCAyMHYtMS4zNzJhNCA0IDAgMCAwLTMuMTUyLT MuODY3SDkuMTUyQTQgNCAwIDAgMCA2IDE4LjYyOFYyMCIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTAiIHI9IjQiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjwvc3ZnPg==`;
             
             profilePfp.src = pfpUrl;
+            userPfp.src = pfpUrl; // Update header pfp as well
             profileName.textContent = userProfile?.full_name || metadata.full_name || currentUser.email;
             profileEmail.textContent = currentUser.email;
 
@@ -582,16 +911,15 @@
             
             if (userProfile?.resume_url) {
                 const fileName = userProfile.resume_url.split('/').pop().split('?')[0];
-                resumeStatusDiv.innerHTML = `<p class="text-sm text-gray-300">Current resume:</p><a href="${userProfile.resume_url}" target="_blank" class="text-indigo-400 hover:underline break-all">${decodeURIComponent(fileName)}</a>`;
+                resumeStatusDiv.innerHTML = `<p class="text-sm text-gray-600">Current resume:</p><a href="${userProfile.resume_url}" target="_blank" class="text-indigo-600 hover:underline break-all">${decodeURIComponent(fileName)}</a>`;
             } else {
-                resumeStatusDiv.innerHTML = `<p class="text-sm text-gray-400">No resume uploaded.</p>`;
+                resumeStatusDiv.innerHTML = `<p class="text-sm text-gray-500">No resume uploaded.</p>`;
             }
         };
 
         profileForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const submitBtn = e.submitter;
-            setLoadingState(submitBtn, true);
+            setLoadingState(saveProfileBtn, true);
             const formData = new FormData(profileForm);
             const updates = {
                 id: currentUser.id,
@@ -610,8 +938,42 @@
                 await fetchUserProfile(currentUser.id);
                 displayProfileData();
             }
-            setLoadingState(submitBtn, false);
+            setLoadingState(saveProfileBtn, false);
         });
+        
+        // --- PFP Upload ---
+        pfpUploadInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentUser) return;
+
+            const filePath = `${currentUser.id}/avatar`;
+            showToast('Uploading new profile picture...');
+
+            const { error: uploadError } = await _supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
+
+            if (uploadError) {
+                showToast('Error uploading picture: ' + uploadError.message, true);
+                return;
+            }
+            
+            const cacheBuster = `?t=${new Date().getTime()}`;
+            const { data } = _supabase.storage.from('avatars').getPublicUrl(filePath);
+
+            const publicUrl = data.publicUrl + cacheBuster;
+
+            const { error: userUpdateError } = await _supabase.auth.updateUser({
+                data: { avatar_url: publicUrl }
+            });
+
+            if (userUpdateError) {
+                showToast('Error updating profile picture: ' + userUpdateError.message, true);
+            } else {
+                showToast('Profile picture updated!');
+                currentUser.user_metadata.avatar_url = publicUrl;
+                displayProfileData();
+            }
+        });
+
 
         // --- Resume Upload Logic ---
         uploadResumeBtn.addEventListener('click', () => resumeUploadInput.click());
@@ -654,7 +1016,10 @@
         _supabase.auth.onAuthStateChange(async (event, session) => {
             if (session?.user) {
                 currentUser = session.user;
-                await fetchUserProfile(currentUser.id);
+                await Promise.all([
+                    fetchUserProfile(currentUser.id),
+                    fetchAppliedJobs()
+                ]);
                 
                 const metadata = currentUser.user_metadata;
                 const name = userProfile?.full_name || metadata.full_name || currentUser.email.split('@')[0];
@@ -665,16 +1030,33 @@
                 
                 userProfileButton.classList.remove('hidden');
                 userProfileButton.classList.add('flex');
+
+                if (currentUser.id === ADMIN_USER_ID) {
+                    showAdminPanelBtn.classList.remove('hidden');
+                    showAdminPanelBtn.onclick = () => {
+                        editPanel.classList.add('hidden');
+                        adminPanel.classList.toggle('hidden');
+                        window.scrollTo(0, 0);
+                    }
+                     showPostNewsBtn.classList.remove('hidden');
+                } else {
+                    showAdminPanelBtn.classList.add('hidden');
+                    adminPanel.classList.add('hidden');
+                    showPostNewsBtn.classList.add('hidden');
+                }
                                 
-                showJobBoard(); 
-                updateJobListings();
+                showPage('jobs'); 
+                displayJobs();
 
             } else {
                 currentUser = null;
                 userProfile = null;
+                appliedJobIds = new Set();
                 
-                showAuthPage();
+                showPage('auth');
                 userProfileButton.classList.add('hidden');
+                showAdminPanelBtn.classList.add('hidden');
+                showPostNewsBtn.classList.add('hidden');
             }
         });
 
@@ -684,7 +1066,7 @@
             loginFormContainer.classList.toggle('form-hidden');
             signupFormContainer.classList.toggle('form-visible');
             signupFormContainer.classList.toggle('form-hidden');
-            postSignupMessage.classList.add('hidden'); // Hide message when toggling
+            postSignupMessage.classList.add('hidden');
         };
         showSignupBtn.addEventListener('click', (e) => { e.preventDefault(); toggleForms(); });
         showLoginBtn.addEventListener('click', (e) => { e.preventDefault(); toggleForms(); });
@@ -692,9 +1074,7 @@
 
         signupFormEl.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const submitBtn = e.submitter;
-            setLoadingState(submitBtn, true);
-
+            setLoadingState(signupBtn, true);
             const email = signupFormEl['signup-email'].value;
             const password = signupFormEl['signup-password'].value;
             const name = signupFormEl['signup-name'].value;
@@ -711,14 +1091,12 @@
                 signupFormContainer.classList.add('form-hidden');
                 postSignupMessage.classList.remove('hidden');
             }
-            setLoadingState(submitBtn, false);
+            setLoadingState(signupBtn, false);
         });
 
         loginFormEl.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const submitBtn = e.submitter;
-            setLoadingState(submitBtn, true);
-
+            setLoadingState(loginBtn, true);
             const email = loginFormEl['login-email'].value;
             const password = loginFormEl['login-password'].value;
             
@@ -727,7 +1105,7 @@
             if (error) {
                 showToast(error.message, true);
             }
-            setLoadingState(submitBtn, false);
+            setLoadingState(loginBtn, false);
         });
         
         async function signInWithGoogle() {
@@ -743,8 +1121,7 @@
         
         addJobForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const submitBtn = e.submitter;
-            setLoadingState(submitBtn, true);
+            setLoadingState(addJobBtn, true);
             const formData = new FormData(addJobForm);
             const jobData = Object.fromEntries(formData.entries());
             const { error } = await _supabase.from('Jobs').insert([jobData]);
@@ -753,15 +1130,14 @@
                 showToast('Job posted successfully!');
                 addJobForm.reset();
                 adminPanel.classList.add('hidden');
-                updateJobListings();
+                displayJobs();
             }
-            setLoadingState(submitBtn, false);
+            setLoadingState(addJobBtn, false);
         });
 
         editJobForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const submitBtn = e.submitter;
-            setLoadingState(submitBtn, true);
+            setLoadingState(updateJobBtn, true);
             const formData = new FormData(editJobForm);
             const jobId = formData.get('id');
             formData.delete('id');
@@ -771,9 +1147,9 @@
             else {
                 showToast('Job updated successfully!');
                 editPanel.classList.add('hidden');
-                updateJobListings();
+                displayJobs();
             }
-            setLoadingState(submitBtn, false);
+            setLoadingState(updateJobBtn, false);
         });
 
     </script>
