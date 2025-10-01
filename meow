@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Signup with Supabase</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .form-transition { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
+        .form-hidden { display: none; opacity: 0; transform: scale(0.95); }
+        .form-visible { display: block; opacity: 1; transform: scale(1); }
+        #auth-container.hidden, #app-container.hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen">
+
+    <div id="auth-container" class="relative w-full max-w-md mx-auto bg-gray-800 text-white rounded-2xl shadow-2xl p-8 overflow-hidden">
+        
+        <!-- Login Form -->
+        <div id="login-form" class="form-transition form-visible">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold tracking-tight">Welcome Back!</h1>
+                <p class="text-gray-400 mt-2">Sign in to continue to your account.</p>
+            </div>
+            
+            <form id="login-form-element">
+                <div id="login-error" class="hidden bg-red-500 text-white p-3 rounded-lg mb-4 text-sm"></div>
+                <div class="space-y-6">
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-gray-300">Email Address</label>
+                        <input type="email" id="login-email" name="email" placeholder="you@example.com" required
+                               class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <label for="login-password" class="block text-sm font-medium text-gray-300">Password</label>
+                            <a href="#" class="text-sm font-medium text-indigo-400 hover:text-indigo-300">Forgot password?</a>
+                        </div>
+                        <input type="password" id="login-password" name="password" placeholder="••••••••" required
+                               class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <button type="submit"
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
+                        Sign In
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 relative">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-600"></div></div>
+                <div class="relative flex justify-center text-sm"><span class="px-2 bg-gray-800 text-gray-400">Or continue with</span></div>
+            </div>
+
+            <div class="mt-6">
+                <button id="google-signin-btn" type="button"
+                        class="w-full inline-flex justify-center py-3 px-4 border border-gray-600 rounded-lg shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
+                    <svg class="w-5 h-5 mr-2 -ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-76.2 76.2c-20.1-17.1-47.3-27.1-78.7-27.1-71.8 0-130 58.2-130 130s58.2 130 130 130c83.5 0 119.8-63.1 123.6-96.1H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>
+                    Sign in with Google
+                </button>
+            </div>
+
+            <p class="mt-8 text-center text-sm text-gray-400">
+                Don't have an account? 
+                <button id="show-signup" class="font-medium text-indigo-400 hover:text-indigo-300">Sign up</button>
+            </p>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-form" class="form-transition form-hidden">
+             <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold tracking-tight">Create an Account</h1>
+                <p class="text-gray-400 mt-2">Get started with a free account today.</p>
+            </div>
+            
+            <form id="signup-form-element">
+                <div id="signup-error" class="hidden bg-red-500 text-white p-3 rounded-lg mb-4 text-sm"></div>
+                <div class="space-y-6">
+                    <!-- Name input is not used in Supabase auth by default, but kept for UI -->
+                    <div>
+                        <label for="signup-name" class="block text-sm font-medium text-gray-300">Full Name</label>
+                        <input type="text" id="signup-name" name="name" placeholder="John Doe" required
+                               class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                    </div>
+                    <div>
+                        <label for="signup-email" class="block text-sm font-medium text-gray-300">Email Address</label>
+                        <input type="email" id="signup-email" name="email" placeholder="you@example.com" required
+                               class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                    </div>
+                    <div>
+                        <label for="signup-password" class="block text-sm font-medium text-gray-300">Password</label>
+                        <input type="password" id="signup-password" name="password" placeholder="Minimum 6 characters" required
+                               class="mt-2 block w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3">
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <button type="submit"
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 relative">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-600"></div></div>
+                <div class="relative flex justify-center text-sm"><span class="px-2 bg-gray-800 text-gray-400">Or sign up with</span></div>
+            </div>
+
+            <div class="mt-6">
+                <button id="google-signup-btn" type="button"
+                        class="w-full inline-flex justify-center py-3 px-4 border border-gray-600 rounded-lg shadow-sm bg-gray-700 text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
+                     <svg class="w-5 h-5 mr-2 -ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-76.2 76.2c-20.1-17.1-47.3-27.1-78.7-27.1-71.8 0-130 58.2-130 130s58.2 130 130 130c83.5 0 119.8-63.1 123.6-96.1H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>
+                    Sign up with Google
+                </button>
+            </div>
+
+            <p class="mt-8 text-center text-sm text-gray-400">
+                Already have an account? 
+                <button id="show-login" class="font-medium text-indigo-400 hover:text-indigo-300">Sign in</button>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Logged in state -->
+    <div id="app-container" class="hidden text-center bg-gray-800 text-white p-8 rounded-2xl shadow-2xl">
+        <h1 class="text-3xl font-bold">Welcome!</h1>
+        <p class="mt-2 text-gray-400">You are successfully logged in.</p>
+        <p id="user-email" class="mt-4 text-lg text-indigo-400"></p>
+        <button id="logout-btn" class="mt-8 w-full max-w-xs mx-auto flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
+            Logout
+        </button>
+    </div>
+
+    <script>
+        const { createClient } = supabase;
+
+        // =========================================================================================
+        // TODO: Add your Supabase project URL and anon key here
+        // =========================================================================================
+        const SUPABASE_URL = 'https://vhefdvimaeleadjscfqd.supabase.co'; // Paste your URL here
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoZWZkdmltYWVsZWFkanNjZnFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyODQ2NTIsImV4cCI6MjA3NDg2MDY1Mn0.EBjGCi1XIEbttotFeM3ESKbpWBOPyrMVnvaVEIlL5c8'; // Paste your anon key here
+        // =========================================================================================
+
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // --- UI Elements ---
+        const loginFormEl = document.getElementById('login-form-element');
+        const signupFormEl = document.getElementById('signup-form-element');
+        const googleSignInBtn = document.getElementById('google-signin-btn');
+        const googleSignUpBtn = document.getElementById('google-signup-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const userEmailDisplay = document.getElementById('user-email');
+        const loginErrorDiv = document.getElementById('login-error');
+        const signupErrorDiv = document.getElementById('signup-error');
+        const showSignupBtn = document.getElementById('show-signup');
+        const showLoginBtn = document.getElementById('show-login');
+        const loginFormContainer = document.getElementById('login-form');
+        const signupFormContainer = document.getElementById('signup-form');
+
+        // --- Form Toggling ---
+        const toggleForms = () => {
+            loginFormContainer.classList.toggle('form-visible');
+            loginFormContainer.classList.toggle('form-hidden');
+            signupFormContainer.classList.toggle('form-visible');
+            signupFormContainer.classList.toggle('form-hidden');
+        };
+        showSignupBtn.addEventListener('click', (e) => { e.preventDefault(); toggleForms(); });
+        showLoginBtn.addEventListener('click', (e) => { e.preventDefault(); toggleForms(); });
+
+        // --- AUTH LOGIC ---
+        function showAuthError(errorDiv, message) {
+            errorDiv.textContent = message || "An unexpected error occurred.";
+            errorDiv.classList.remove('hidden');
+        }
+
+        // Sign up with Email/Password
+        signupFormEl.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            signupErrorDiv.classList.add('hidden');
+            const email = signupFormEl['signup-email'].value;
+            const password = signupFormEl['signup-password'].value;
+            
+            const { data, error } = await _supabase.auth.signUp({ email, password });
+
+            if (error) {
+                showAuthError(signupErrorDiv, error.message);
+                console.error('Signup error:', error.message);
+            } else {
+                 // By default, Supabase sends a confirmation email.
+                 // For now, we'll just log success. The onAuthStateChange will handle the UI.
+                alert('Signup successful! Check your email for a confirmation link.');
+                console.log('Signed up user:', data.user);
+            }
+        });
+
+        // Sign in with Email/Password
+        loginFormEl.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginErrorDiv.classList.add('hidden');
+            const email = loginFormEl['login-email'].value;
+            const password = loginFormEl['login-password'].value;
+            
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                showAuthError(loginErrorDiv, error.message);
+                console.error('Login error:', error.message);
+            }
+        });
+        
+        // Sign in with Google
+        async function signInWithGoogle() {
+            const { data, error } = await _supabase.auth.signInWithOAuth({
+                provider: 'google',
+            });
+            if (error) {
+                 showAuthError(loginErrorDiv, error.message);
+                 console.error('Google Sign in error:', error.message);
+            }
+        }
+        googleSignInBtn.addEventListener('click', signInWithGoogle);
+        googleSignUpBtn.addEventListener('click', signInWithGoogle);
+
+        // Logout
+        logoutBtn.addEventListener('click', async () => {
+            const { error } = await _supabase.auth.signOut();
+            if(error) console.error('Logout error', error.message);
+        });
+
+        // --- Auth state listener ---
+        _supabase.auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+                // User is signed in
+                authContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                userEmailDisplay.textContent = session.user.email;
+            } else {
+                // User is signed out
+                authContainer.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+                userEmailDisplay.textContent = '';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
