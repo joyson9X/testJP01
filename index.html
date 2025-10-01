@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login & Signup with Supabase</title>
+    <title>SaaS Job Board with Supabase</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -17,13 +17,66 @@
         .form-transition { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
         .form-hidden { display: none; opacity: 0; transform: scale(0.95); }
         .form-visible { display: block; opacity: 1; transform: scale(1); }
-        #auth-container.hidden, #app-container.hidden { display: none; }
+        #auth-container.hidden, #app-wrapper.hidden { display: none; }
+        .job-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: cardFadeIn 0.5s ease-out forwards;
+        }
+        @keyframes cardFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .filter-btn.active {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+        }
+        /* Toast Notification Styles */
+        #toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: bottom 0.5s ease-in-out;
+            z-index: 100;
+        }
+        #toast.show {
+            bottom: 20px;
+        }
+        /* Spinner Styles */
+        .spinner {
+            border: 2px solid #4f46e5;
+            border-top-color: transparent;
+            border-radius: 50%;
+            width: 1rem;
+            height: 1rem;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body class="bg-gray-900 flex items-center justify-center min-h-screen">
+<body class="bg-gray-900 min-h-screen p-4 flex items-center justify-center">
+
+    <!-- Toast Notification Element -->
+    <div id="toast"></div>
 
     <div id="auth-container" class="relative w-full max-w-md mx-auto bg-gray-800 text-white rounded-2xl shadow-2xl p-8 overflow-hidden">
         
+        <!-- Post-Signup Message -->
+        <div id="post-signup-message" class="hidden text-center">
+            <h2 class="text-2xl font-bold text-green-400">Success!</h2>
+            <p class="text-gray-300 mt-2">Please check your email for a confirmation link to complete your registration.</p>
+        </div>
+
         <!-- Login Form -->
         <div id="login-form" class="form-transition form-visible">
             <div class="text-center mb-8">
@@ -32,7 +85,6 @@
             </div>
             
             <form id="login-form-element">
-                <div id="login-error" class="hidden bg-red-500 text-white p-3 rounded-lg mb-4 text-sm"></div>
                 <div class="space-y-6">
                     <div>
                         <label for="login-email" class="block text-sm font-medium text-gray-300">Email Address</label>
@@ -51,8 +103,8 @@
                 
                 <div class="mt-8">
                     <button type="submit"
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
-                        Sign In
+                            class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="btn-text">Sign In</span>
                     </button>
                 </div>
             </form>
@@ -84,9 +136,7 @@
             </div>
             
             <form id="signup-form-element">
-                <div id="signup-error" class="hidden bg-red-500 text-white p-3 rounded-lg mb-4 text-sm"></div>
                 <div class="space-y-6">
-                    <!-- Name input is not used in Supabase auth by default, but kept for UI -->
                     <div>
                         <label for="signup-name" class="block text-sm font-medium text-gray-300">Full Name</label>
                         <input type="text" id="signup-name" name="name" placeholder="John Doe" required
@@ -106,8 +156,8 @@
                 
                 <div class="mt-8">
                     <button type="submit"
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
-                        Create Account
+                            class="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="btn-text">Create Account</span>
                     </button>
                 </div>
             </form>
@@ -132,130 +182,600 @@
         </div>
     </div>
     
-    <!-- Logged in state -->
-    <div id="app-container" class="hidden text-center bg-gray-800 text-white p-8 rounded-2xl shadow-2xl">
-        <h1 class="text-3xl font-bold">Welcome!</h1>
-        <p class="mt-2 text-gray-400">You are successfully logged in.</p>
-        <p id="user-email" class="mt-4 text-lg text-indigo-400"></p>
-        <button id="logout-btn" class="mt-8 w-full max-w-xs mx-auto flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors">
-            Logout
-        </button>
+    <div id="app-wrapper" class="hidden w-full max-w-5xl mx-auto">
+        <!-- Job Board Page -->
+        <div id="job-board-container" class="hidden w-full bg-gray-800 text-white rounded-2xl shadow-2xl p-8">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center pb-6 border-b border-gray-700 mb-6">
+                <h1 class="text-3xl font-bold tracking-tight mb-4 sm:mb-0">Job Board</h1>
+                <div class="flex items-center">
+                    <button id="show-admin-panel-btn" class="hidden mr-4 py-2 px-4 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg">Post Job</button>
+                    <button id="user-profile-button" class="hidden items-center mr-4 cursor-pointer group">
+                        <span id="user-name-display" class="text-gray-300 group-hover:text-white font-medium mr-3 text-sm"></span>
+                        <img id="user-pfp" src="" alt="User Profile Picture" class="w-9 h-9 rounded-full bg-gray-700 border-2 border-gray-600 group-hover:border-indigo-400">
+                    </button>
+                    <button id="logout-btn" class="w-full sm:w-auto flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Logout</button>
+                </div>
+            </div>
+            <div id="job-board-content">
+                <!-- Admin "Add Job" Panel (Hidden by default) -->
+                <div id="admin-panel" class="hidden bg-gray-700 p-6 rounded-lg mb-8">
+                    <h2 class="text-xl font-bold mb-4 text-white">Admin: Post a New Job</h2>
+                    <form id="add-job-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input name="title" required placeholder="Job Title" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
+                        <input name="company" required placeholder="Company Name" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
+                        <input name="location" required placeholder="Location" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
+                        <input name="salary" placeholder="Salary e.g., $50/hr" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
+                        <select name="type" class="bg-gray-800 text-white rounded p-2 border border-gray-600">
+                            <option>Remote</option>
+                            <option>On-site</option>
+                            <option>Hybrid</option>
+                        </select>
+                        <select name="experience" class="bg-gray-800 text-white rounded p-2 border border-gray-600">
+                            <option>Entry</option>
+                            <option>Intermediate</option>
+                            <option>Expert</option>
+                        </select>
+                        <input name="logo_url" placeholder="Company Logo URL" class="md:col-span-2 bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
+                        <textarea name="description" placeholder="Job Description" class="md:col-span-2 bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400"></textarea>
+                        <button type="submit" class="md:col-span-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center disabled:opacity-50">
+                            <span class="btn-text">Post Job</span>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Admin "Edit Job" Panel (Hidden by default) -->
+                <div id="edit-panel" class="hidden bg-gray-700 p-6 rounded-lg mb-8">
+                    <h2 class="text-xl font-bold mb-4 text-white">Admin: Edit Job Post</h2>
+                    <form id="edit-job-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="hidden" name="id">
+                        <input name="title" required placeholder="Job Title" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
+                        <input name="company" required placeholder="Company Name" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
+                        <input name="location" required placeholder="Location" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
+                        <input name="salary" placeholder="Salary e.g., $50/hr" class="bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
+                        <select name="type" class="bg-gray-800 text-white rounded p-2 border border-gray-600">
+                            <option>Remote</option>
+                            <option>On-site</option>
+                            <option>Hybrid</option>
+                        </select>
+                        <select name="experience" class="bg-gray-800 text-white rounded p-2 border border-gray-600">
+                            <option>Entry</option>
+                            <option>Intermediate</option>
+                            <option>Expert</option>
+                        </select>
+                        <input name="logo_url" placeholder="Company Logo URL" class="md:col-span-2 bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400">
+                        <textarea name="description" placeholder="Job Description" class="md:col-span-2 bg-gray-800 text-white rounded p-2 border border-gray-600 placeholder-gray-400"></textarea>
+                        <div class="md:col-span-2 flex items-center gap-4">
+                            <button type="submit" class="flex-grow bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center disabled:opacity-50">
+                                <span class="btn-text">Update Job</span>
+                            </button>
+                            <button type="button" id="cancel-edit-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="flex flex-col md:flex-row gap-4 mb-8">
+                    <div class="relative flex-grow">
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="search-input" placeholder="Search for jobs, companies..." class="w-full bg-gray-700 border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 pl-12">
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <button class="filter-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-2 px-4 rounded-lg text-sm transition-colors" data-filter="all">All</button>
+                        <button class="filter-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-2 px-4 rounded-lg text-sm transition-colors" data-filter="Remote">Remote</button>
+                        <button class="filter-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-2 px-4 rounded-lg text-sm transition-colors" data-filter="On-site">On-site</button>
+                    </div>
+                </div>
+
+                <!-- Job Listings -->
+                <div id="job-listings" class="space-y-6">
+                    <!-- Job cards will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Page -->
+        <div id="profile-page-container" class="hidden w-full bg-gray-800 text-white rounded-2xl shadow-2xl p-8">
+            <div class="flex justify-between items-center pb-6 border-b border-gray-700 mb-6">
+                 <h1 class="text-3xl font-bold tracking-tight">My Profile</h1>
+                 <button id="back-to-jobs-btn" class="py-2 px-4 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg">Back to Jobs</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Left Column: PFP and Resume -->
+                <div class="md:col-span-1 space-y-6">
+                    <div class="text-center">
+                        <img id="profile-pfp" src="" class="w-32 h-32 rounded-full mx-auto bg-gray-700 border-4 border-gray-600">
+                        <p id="profile-name" class="text-xl font-bold mt-4"></p>
+                        <p id="profile-email" class="text-sm text-gray-400"></p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2">Resume</h3>
+                        <div id="resume-status"></div>
+                        <input type="file" id="resume-upload-input" class="hidden" accept=".pdf,.doc,.docx">
+                        <button id="upload-resume-btn" class="w-full text-center py-2 px-4 mt-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg flex items-center justify-center disabled:opacity-50">
+                           <span class="btn-text">Upload Resume</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Details Form -->
+                <div class="md:col-span-2">
+                    <form id="profile-form">
+                        <div class="space-y-6">
+                             <div>
+                                <label for="profile-full-name" class="block text-sm font-medium text-gray-300">Full Name</label>
+                                <input type="text" name="full_name" id="profile-full-name" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white">
+                            </div>
+                             <div>
+                                <label for="profile-headline" class="block text-sm font-medium text-gray-300">Headline</label>
+                                <input type="text" name="headline" id="profile-headline" placeholder="e.g. Senior Product Designer" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white">
+                            </div>
+                            <div>
+                                <label for="profile-bio" class="block text-sm font-medium text-gray-300">Bio</label>
+                                <textarea name="bio" id="profile-bio" rows="4" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-lg p-2 text-white"></textarea>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                             <button type="submit" class="py-2 px-4 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg flex items-center justify-center disabled:opacity-50">
+                                <span class="btn-text">Save Changes</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
 
     <script>
         const { createClient } = supabase;
-
-        // =========================================================================================
-        // TODO: Add your Supabase project URL and anon key here
-        // =========================================================================================
-        const SUPABASE_URL = 'https://vhefdvimaeleadjscfqd.supabase.co'; // Paste your URL here
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoZWZkdmltYWVsZWFkanNjZnFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyODQ2NTIsImV4cCI6MjA3NDg2MDY1Mn0.EBjGCi1XIEbttotFeM3ESKbpWBOPyrMVnvaVEIlL5c8'; // Paste your anon key here
-        // =========================================================================================
-
+        const SUPABASE_URL = 'https://vhefdvimaeleadjscfqd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoZWZkdmltYWVsZWFkanNjZnFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyODQ2NTIsImV4cCI6MjA3NDg2MDY1Mn0.EBjGCi1XIEbttotFeM3ESKbpWBOPyrMVnvaVEIlL5c8';
+        const ADMIN_USER_ID = '5313a206-1ecb-4fb1-a93c-620ab9d667c6';
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
+        // --- Global State ---
+        let allJobs = [];
+        let currentUser = null;
+        let userProfile = null;
+        
         // --- UI Elements ---
+        const body = document.body;
+        const toast = document.getElementById('toast');
+        const authContainer = document.getElementById('auth-container');
+        const appWrapper = document.getElementById('app-wrapper');
+        const postSignupMessage = document.getElementById('post-signup-message');
+        const jobBoardContainer = document.getElementById('job-board-container');
+        const userProfileButton = document.getElementById('user-profile-button');
+        const userNameDisplay = document.getElementById('user-name-display');
+        const userPfp = document.getElementById('user-pfp');
+        const profilePageContainer = document.getElementById('profile-page-container');
+        const backToJobsBtn = document.getElementById('back-to-jobs-btn');
+        const profileForm = document.getElementById('profile-form');
+        const profilePfp = document.getElementById('profile-pfp');
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const resumeStatusDiv = document.getElementById('resume-status');
+        const uploadResumeBtn = document.getElementById('upload-resume-btn');
+        const resumeUploadInput = document.getElementById('resume-upload-input');
+        const jobListingsContainer = document.getElementById('job-listings');
+        const searchInput = document.getElementById('search-input');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const adminPanel = document.getElementById('admin-panel');
+        const showAdminPanelBtn = document.getElementById('show-admin-panel-btn');
+        const addJobForm = document.getElementById('add-job-form');
+        const editPanel = document.getElementById('edit-panel');
+        const editJobForm = document.getElementById('edit-job-form');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
         const loginFormEl = document.getElementById('login-form-element');
         const signupFormEl = document.getElementById('signup-form-element');
-        const googleSignInBtn = document.getElementById('google-signin-btn');
-        const googleSignUpBtn = document.getElementById('google-signup-btn');
         const logoutBtn = document.getElementById('logout-btn');
-        const authContainer = document.getElementById('auth-container');
-        const appContainer = document.getElementById('app-container');
-        const userEmailDisplay = document.getElementById('user-email');
-        const loginErrorDiv = document.getElementById('login-error');
-        const signupErrorDiv = document.getElementById('signup-error');
         const showSignupBtn = document.getElementById('show-signup');
         const showLoginBtn = document.getElementById('show-login');
         const loginFormContainer = document.getElementById('login-form');
         const signupFormContainer = document.getElementById('signup-form');
 
-        // --- Form Toggling ---
+        // --- UI Helper Functions ---
+        const showToast = (message, isError = false) => {
+            toast.textContent = message;
+            toast.style.backgroundColor = isError ? '#ef4444' : '#22c55e'; // red-500 or green-500
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+
+        const setLoadingState = (button, isLoading) => {
+            const btnText = button.querySelector('.btn-text');
+            if (isLoading) {
+                button.disabled = true;
+                if(btnText) btnText.textContent = 'Loading...';
+                const spinner = document.createElement('div');
+                spinner.className = 'spinner ml-2';
+                button.appendChild(spinner);
+            } else {
+                button.disabled = false;
+                if(btnText) btnText.textContent = button.dataset.originalText;
+                const spinner = button.querySelector('.spinner');
+                if (spinner) spinner.remove();
+            }
+        };
+        
+        // Store original button text
+        document.querySelectorAll('button[type="submit"], #upload-resume-btn').forEach(btn => {
+            const btnText = btn.querySelector('.btn-text');
+            if (btnText) {
+                btn.dataset.originalText = btnText.textContent;
+            }
+        });
+
+
+        // --- Navigation Functions ---
+        const showJobBoard = () => {
+            appWrapper.classList.remove('hidden');
+            jobBoardContainer.classList.remove('hidden');
+            profilePageContainer.classList.add('hidden');
+            authContainer.classList.add('hidden');
+        };
+
+        const showProfilePage = () => {
+            appWrapper.classList.remove('hidden');
+            jobBoardContainer.classList.add('hidden');
+            profilePageContainer.classList.remove('hidden');
+            authContainer.classList.add('hidden');
+            displayProfileData();
+        };
+
+        const showAuthPage = () => {
+            appWrapper.classList.add('hidden');
+            authContainer.classList.remove('hidden');
+        };
+
+        userProfileButton.addEventListener('click', showProfilePage);
+        backToJobsBtn.addEventListener('click', showJobBoard);
+
+
+        // --- Job Board Functions ---
+        const displayJobs = async (searchTerm = '', filter = 'all') => {
+            jobListingsContainer.innerHTML = `<div class="flex justify-center py-10"><div class="spinner !w-8 !h-8"></div></div>`;
+            
+            let query = _supabase.from('Jobs').select('*').order('created_at', { ascending: false });
+
+            const searchLower = searchTerm.toLowerCase();
+            if (searchLower) {
+                 query = query.or(`title.ilike.%${searchLower}%,company.ilike.%${searchLower}%`);
+            }
+            if (filter !== 'all') {
+                query = query.eq('type', filter);
+            }
+
+            const { data: jobs, error } = await query;
+
+            if (error) {
+                console.error("Error fetching jobs:", error);
+                showToast("Error loading jobs.", true);
+                jobListingsContainer.innerHTML = `<p class="text-center text-red-400 py-10">Error loading jobs. Make sure you have created the 'Jobs' table in Supabase.</p>`;
+                return;
+            }
+            
+            allJobs = jobs; 
+            jobListingsContainer.innerHTML = '';
+
+            if (jobs.length === 0) {
+                jobListingsContainer.innerHTML = `<p class="text-center text-gray-400 py-10">No jobs found.</p>`;
+                return;
+            }
+            
+            jobs.forEach((job, index) => {
+                const logoHtml = job.logo_url
+                    ? `<img src="${job.logo_url}" alt="${job.company} logo" class="w-12 h-12 rounded-lg object-cover bg-gray-700 flex-shrink-0">`
+                    : `<div class="w-12 h-12 rounded-lg bg-gray-800 flex-shrink-0 flex items-center justify-center">
+                           <svg class="w-8 h-8 text-indigo-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                       </div>`;
+
+                const adminActionsHtml = (currentUser?.id === ADMIN_USER_ID)
+                    ? `<div class="flex items-center gap-2">
+                           <button class="edit-job-btn text-sm text-yellow-400 hover:text-yellow-300 font-medium" data-job-id="${job.id}">Edit</button>
+                       </div>`
+                    : '';
+
+                const jobCard = `
+                    <div class="job-card bg-gray-700 p-6 rounded-lg shadow-md hover:bg-gray-600/50 transition-colors" style="animation-delay: ${index * 80}ms">
+                        <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+                             <div class="flex items-center gap-4 flex-grow">
+                                ${logoHtml}
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">${job.title || ''}</h3>
+                                    <p class="text-indigo-400 font-medium">${job.company || ''}</p>
+                                    <div class="flex items-center flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-400">
+                                        <span class="flex items-center gap-1.5">
+                                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                            ${job.location || ''}
+                                        </span>
+                                        <span class="inline-flex items-center rounded-md bg-gray-600 px-2 py-1 text-xs font-medium text-gray-300 ring-1 ring-inset ring-gray-500/10">
+                                            ${job.type || ''}
+                                        </span>
+                                         <span class="font-semibold">${job.salary || ''}</span>
+                                    </div>
+                                 </div>
+                             </div>
+                             <div class="flex flex-col sm:items-end gap-3 flex-shrink-0 w-full sm:w-auto">
+                                <button class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors">Apply Now</button>
+                                ${adminActionsHtml}
+                             </div>
+                        </div>
+                    </div>
+                `;
+                jobListingsContainer.innerHTML += jobCard;
+            });
+        };
+
+        const updateJobListings = () => {
+            const searchTerm = searchInput.value;
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            displayJobs(searchTerm, activeFilter);
+        };
+
+        searchInput.addEventListener('input', updateJobListings);
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                updateJobListings();
+            });
+        });
+        document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+        
+        const openEditPanel = (jobId) => {
+            const jobToEdit = allJobs.find(j => j.id == jobId);
+            if (!jobToEdit) return;
+            for (const key in jobToEdit) {
+                if (editJobForm.elements[key]) {
+                    editJobForm.elements[key].value = jobToEdit[key];
+                }
+            }
+            editJobForm.elements['id'].value = jobToEdit.id;
+            adminPanel.classList.add('hidden');
+            editPanel.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        };
+
+        jobListingsContainer.addEventListener('click', (e) => {
+            const editBtn = e.target.closest('.edit-job-btn');
+            if (editBtn) {
+                openEditPanel(editBtn.dataset.jobId);
+            }
+        });
+        
+        cancelEditBtn.addEventListener('click', () => {
+            editPanel.classList.add('hidden');
+        });
+
+        // --- Profile Data Functions ---
+        const fetchUserProfile = async (userId) => {
+            const { data, error } = await _supabase.from('profiles').select('*').eq('id', userId).single();
+            if (error && error.code !== 'PGRST116') {
+                console.error('Error fetching profile:', error);
+            }
+            userProfile = data;
+        };
+
+        const displayProfileData = () => {
+            if (!currentUser) return;
+            const metadata = currentUser.user_metadata;
+            const pfpUrl = metadata.avatar_url || `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZHRoPSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MDkyYmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOCAyMHYtMS4zNzJhNCA0IDAgMCAwLTMuMTUyLT MuODY3SDkuMTUyQTQgNCAwIDAgMCA2IDE4LjYyOFYyMCIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTAiIHI9IjQiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjwvc3ZnPg==`;
+            
+            profilePfp.src = pfpUrl;
+            profileName.textContent = userProfile?.full_name || metadata.full_name || currentUser.email;
+            profileEmail.textContent = currentUser.email;
+
+            profileForm.elements['full_name'].value = userProfile?.full_name || metadata.full_name || '';
+            profileForm.elements['headline'].value = userProfile?.headline || '';
+            profileForm.elements['bio'].value = userProfile?.bio || '';
+            
+            if (userProfile?.resume_url) {
+                const fileName = userProfile.resume_url.split('/').pop().split('?')[0];
+                resumeStatusDiv.innerHTML = `<p class="text-sm text-gray-300">Current resume:</p><a href="${userProfile.resume_url}" target="_blank" class="text-indigo-400 hover:underline break-all">${decodeURIComponent(fileName)}</a>`;
+            } else {
+                resumeStatusDiv.innerHTML = `<p class="text-sm text-gray-400">No resume uploaded.</p>`;
+            }
+        };
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = e.submitter;
+            setLoadingState(submitBtn, true);
+            const formData = new FormData(profileForm);
+            const updates = {
+                id: currentUser.id,
+                full_name: formData.get('full_name'),
+                headline: formData.get('headline'),
+                bio: formData.get('bio'),
+                updated_at: new Date(),
+            };
+            
+            const { error } = await _supabase.from('profiles').upsert(updates);
+
+            if (error) {
+                showToast('Error updating profile: ' + error.message, true);
+            } else {
+                showToast('Profile updated successfully!');
+                await fetchUserProfile(currentUser.id);
+                displayProfileData();
+            }
+            setLoadingState(submitBtn, false);
+        });
+
+        // --- Resume Upload Logic ---
+        uploadResumeBtn.addEventListener('click', () => resumeUploadInput.click());
+
+        resumeUploadInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentUser) return;
+
+            const filePath = `${currentUser.id}/${Date.now()}_${file.name}`;
+            setLoadingState(uploadResumeBtn, true);
+
+            const { error: uploadError } = await _supabase.storage.from('resumes').upload(filePath, file, { upsert: true });
+
+            if (uploadError) {
+                showToast('Error uploading resume: ' + uploadError.message, true);
+                setLoadingState(uploadResumeBtn, false);
+                return;
+            }
+
+            const { data } = _supabase.storage.from('resumes').getPublicUrl(filePath);
+            const publicUrl = data.publicUrl;
+
+            const { error: dbError } = await _supabase.from('profiles').upsert({
+                id: currentUser.id,
+                resume_url: publicUrl,
+                updated_at: new Date()
+            });
+
+            if (dbError) {
+                showToast('Error saving resume URL: ' + dbError.message, true);
+            } else {
+                showToast('Resume uploaded successfully!');
+                await fetchUserProfile(currentUser.id);
+                displayProfileData();
+            }
+            setLoadingState(uploadResumeBtn, false);
+        });
+
+        // --- Auth state listener ---
+        _supabase.auth.onAuthStateChange(async (event, session) => {
+            if (session?.user) {
+                currentUser = session.user;
+                await fetchUserProfile(currentUser.id);
+                
+                const metadata = currentUser.user_metadata;
+                const name = userProfile?.full_name || metadata.full_name || currentUser.email.split('@')[0];
+                const pfpUrl = metadata.avatar_url;
+
+                userNameDisplay.textContent = name;
+                userPfp.src = pfpUrl || `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZHRoPSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MDkyYmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOCAyMHYtMS4zNzJhNCA0IDAgMCAwLTMuMTUyLT MuODY3SDkuMTUyQTQgNCAwIDAgMCA2IDE4LjYyOFYyMCIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTAiIHI9IjQiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjwvc3ZnPg==`;
+                
+                userProfileButton.classList.remove('hidden');
+                userProfileButton.classList.add('flex');
+                
+                body.classList.remove('flex', 'items-center', 'justify-center');
+                
+                showJobBoard(); 
+                updateJobListings();
+
+            } else {
+                currentUser = null;
+                userProfile = null;
+                
+                body.classList.add('flex', 'items-center', 'justify-center');
+
+                showAuthPage();
+                userProfileButton.classList.add('hidden');
+            }
+        });
+
+        // --- Other Auth Functions ---
         const toggleForms = () => {
             loginFormContainer.classList.toggle('form-visible');
             loginFormContainer.classList.toggle('form-hidden');
             signupFormContainer.classList.toggle('form-visible');
             signupFormContainer.classList.toggle('form-hidden');
+            postSignupMessage.classList.add('hidden'); // Hide message when toggling
         };
         showSignupBtn.addEventListener('click', (e) => { e.preventDefault(); toggleForms(); });
         showLoginBtn.addEventListener('click', (e) => { e.preventDefault(); toggleForms(); });
 
-        // --- AUTH LOGIC ---
-        function showAuthError(errorDiv, message) {
-            errorDiv.textContent = message || "An unexpected error occurred.";
-            errorDiv.classList.remove('hidden');
-        }
 
-        // Sign up with Email/Password
         signupFormEl.addEventListener('submit', async (e) => {
             e.preventDefault();
-            signupErrorDiv.classList.add('hidden');
+            const submitBtn = e.submitter;
+            setLoadingState(submitBtn, true);
+
             const email = signupFormEl['signup-email'].value;
             const password = signupFormEl['signup-password'].value;
+            const name = signupFormEl['signup-name'].value;
             
-            const { data, error } = await _supabase.auth.signUp({ email, password });
+            const { data, error } = await _supabase.auth.signUp({
+                email, password,
+                options: { data: { full_name: name } }
+            });
 
             if (error) {
-                showAuthError(signupErrorDiv, error.message);
-                console.error('Signup error:', error.message);
+                showToast(error.message, true);
             } else {
-                 // By default, Supabase sends a confirmation email.
-                 // For now, we'll just log success. The onAuthStateChange will handle the UI.
-                alert('Signup successful! Check your email for a confirmation link.');
-                console.log('Signed up user:', data.user);
+                loginFormContainer.classList.add('form-hidden');
+                signupFormContainer.classList.add('form-hidden');
+                postSignupMessage.classList.remove('hidden');
             }
+            setLoadingState(submitBtn, false);
         });
 
-        // Sign in with Email/Password
         loginFormEl.addEventListener('submit', async (e) => {
             e.preventDefault();
-            loginErrorDiv.classList.add('hidden');
+            const submitBtn = e.submitter;
+            setLoadingState(submitBtn, true);
+
             const email = loginFormEl['login-email'].value;
             const password = loginFormEl['login-password'].value;
             
-            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            const { error } = await _supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
-                showAuthError(loginErrorDiv, error.message);
-                console.error('Login error:', error.message);
+                showToast(error.message, true);
             }
+            setLoadingState(submitBtn, false);
         });
         
-        // Sign in with Google
         async function signInWithGoogle() {
-            const { data, error } = await _supabase.auth.signInWithOAuth({
-                provider: 'google',
-            });
+            const { error } = await _supabase.auth.signInWithOAuth({ provider: 'google' });
             if (error) {
-                 showAuthError(loginErrorDiv, error.message);
-                 console.error('Google Sign in error:', error.message);
+                 showToast(error.message, true);
             }
         }
-        googleSignInBtn.addEventListener('click', signInWithGoogle);
-        googleSignUpBtn.addEventListener('click', signInWithGoogle);
-
-        // Logout
-        logoutBtn.addEventListener('click', async () => {
-            const { error } = await _supabase.auth.signOut();
-            if(error) console.error('Logout error', error.message);
-        });
-
-        // --- Auth state listener ---
-        _supabase.auth.onAuthStateChange((event, session) => {
-            if (session?.user) {
-                // User is signed in
-                authContainer.classList.add('hidden');
-                appContainer.classList.remove('hidden');
-                userEmailDisplay.textContent = session.user.email;
-            } else {
-                // User is signed out
-                authContainer.classList.remove('hidden');
-                appContainer.classList.add('hidden');
-                userEmailDisplay.textContent = '';
+        document.getElementById('google-signin-btn').addEventListener('click', signInWithGoogle);
+        document.getElementById('google-signup-btn').addEventListener('click', signInWithGoogle);
+        
+        logoutBtn.addEventListener('click', async () => await _supabase.auth.signOut());
+        
+        addJobForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = e.submitter;
+            setLoadingState(submitBtn, true);
+            const formData = new FormData(addJobForm);
+            const jobData = Object.fromEntries(formData.entries());
+            const { error } = await _supabase.from('Jobs').insert([jobData]);
+            if (error) showToast('Error posting job: ' + error.message, true);
+            else {
+                showToast('Job posted successfully!');
+                addJobForm.reset();
+                adminPanel.classList.add('hidden');
+                updateJobListings();
             }
+            setLoadingState(submitBtn, false);
         });
+
+        editJobForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = e.submitter;
+            setLoadingState(submitBtn, true);
+            const formData = new FormData(editJobForm);
+            const jobId = formData.get('id');
+            formData.delete('id');
+            const updatedData = Object.fromEntries(formData.entries());
+            const { error } = await _supabase.from('Jobs').update(updatedData).eq('id', jobId);
+            if (error) showToast('Error updating job: ' + error.message, true);
+            else {
+                showToast('Job updated successfully!');
+                editPanel.classList.add('hidden');
+                updateJobListings();
+            }
+            setLoadingState(submitBtn, false);
+        });
+
     </script>
 </body>
 </html>
-
 
